@@ -1,7 +1,10 @@
-﻿namespace ThreeDictionary.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ThreeDictionary.Domain.Entities;
 
 public class LibraryConfiguration
 {
-    public int Id { get; set; } = 1;
-    public string RootDirectory { get; set; } = string.Empty;
+    [Key] [Required] public int Id { get; set; } = 1;
+    [Required] public bool Initialised { get; set; }
+    [Required] public string RootDirectory { get; set; } = string.Empty;
 }

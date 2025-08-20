@@ -1,0 +1,45 @@
+﻿@page "/settings/configuration"
+@layout SettingsLayout
+@using ThreeDictionary.Application.Services
+@using ThreeDictionary.Components.Settings.Shared
+@using ThreeDictionary.Domain.Entities
+@using ThreeDictionary.Infrastructure.Data
+@inject ApplicationDbContext DbContext
+@inject LibraryService LibraryService
+
+
+@if (!_loaded)
+{
+    <Loading/>
+}
+else
+{
+    // form to show where the library "Assets" folder is located.
+    <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="h-100">
+        <MudText Typo="Typo.h5">Settings</MudText>
+        <MudTextField @bind-Value="_libraryConfiguration.RootDirectory" Label="Default Dictionary Path" Variant="Variant.Outlined"
+                      FullWidth Required/>
+        <MudButton OnClick="@(() => SaveSettings())" Color="Color.Primary" Variant="Variant.Filled" FullWidth>Save
+            Settings
+        </MudButton>
+    </MudStack>
+}
+
+@code{
+
+    private bool _loaded;
+    private LibraryConfiguration? _libraryConfiguration;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _libraryConfiguration = await LibraryService.GetConfigurationAsync();
+        await Task.Delay(Globals.DefaultDelay);
+
+        _loaded = true;
+    }
+
+    private void SaveSettings()
+    {
+    }
+
+}

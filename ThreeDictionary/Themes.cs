@@ -1,4 +1,4 @@
-﻿﻿using MudBlazor;
+﻿using MudBlazor;
 
 namespace ThreeDictionary;
 
@@ -6,7 +6,7 @@ public static class Themes
 {
     public static readonly MudTheme Default = new()
     {
-        PaletteLight = new()
+        PaletteLight = new PaletteLight
         {
             Black = "#110e2d",
             AppbarText = "#424242",
@@ -15,7 +15,7 @@ public static class Themes
             GrayLight = "#e8e8e8",
             GrayLighter = "#f9f9f9"
         },
-        PaletteDark = new()
+        PaletteDark = new PaletteDark
         {
             Black = "rgba(39,39,47,1)",
             Primary = "#a68a64ff",
@@ -65,10 +65,10 @@ public static class Themes
         },
         LayoutProperties = new LayoutProperties()
     };
-    
+
     public static readonly MudTheme Spacelab = new()
     {
-        PaletteLight = new PaletteLight()
+        PaletteLight = new PaletteLight
         {
             Black = "#000",
             White = "#fff",
@@ -134,9 +134,9 @@ public static class Themes
             GrayDark = "#757575",
             GrayDarker = "#616161",
             OverlayDark = "rgba(33,33,33,0.4980392156862745)",
-            OverlayLight = "rgba(255,255,255,0.4980392156862745)",
+            OverlayLight = "rgba(255,255,255,0.4980392156862745)"
         },
-        PaletteDark = new PaletteDark()
+        PaletteDark = new PaletteDark
         {
             Black = "#000",
             White = "#fff",
@@ -191,16 +191,16 @@ public static class Themes
             ErrorDarken = "rgb(242,28,13)",
             ErrorLighten = "rgb(246,96,85)",
             DarkDarken = "rgb(23,23,28)",
-            DarkLighten = "rgb(56,56,67)",
+            DarkLighten = "rgb(56,56,67)"
         },
-        LayoutProperties = new LayoutProperties()
+        LayoutProperties = new LayoutProperties
         {
             DefaultBorderRadius = "4px",
             DrawerMiniWidthLeft = "56px",
             DrawerMiniWidthRight = "56px",
             DrawerWidthLeft = "240px",
             DrawerWidthRight = "240px",
-            AppbarHeight = "50px",
-        },
+            AppbarHeight = "50px"
+        }
     };
 }

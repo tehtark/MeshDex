@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using ThreeDictionary.Data;
 using ThreeDictionary.Domain.Entities;
 
 namespace ThreeDictionary.Components.Account;

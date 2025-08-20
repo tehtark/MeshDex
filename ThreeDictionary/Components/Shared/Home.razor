@@ -1,0 +1,36 @@
+﻿@page "/"
+@using ThreeDictionary.Application.Services
+@using ThreeDictionary.Components.Browser
+@inject NavigationManager NavigationManager
+@inject LibraryService LibraryService
+
+<PageTitle>3Dictionary</PageTitle>
+
+@if (!_loaded)
+{
+    <Loading/>
+}
+else
+{
+    <FileBrowser/>
+}
+
+@code{
+
+    private bool _loaded;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var libraryConfiguration = await LibraryService.GetConfigurationAsync();
+        
+        if(libraryConfiguration is { Initialised: false })
+        {
+            NavigationManager.NavigateTo("/setup");
+        }
+        
+        await Task.Delay(Globals.DefaultDelay);
+        
+        _loaded = true;
+    }
+
+}

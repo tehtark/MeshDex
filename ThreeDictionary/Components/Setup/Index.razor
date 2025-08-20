@@ -1,0 +1,116 @@
+﻿@page "/setup"
+@layout SetupLayout
+@using ThreeDictionary.Application.Services
+@using ThreeDictionary.Domain.Entities
+@inject ISnackbar Snackbar
+@inject LibraryService LibraryService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Setup</PageTitle>
+
+<MudContainer MaxWidth="MaxWidth.Medium"
+              Class="d-flex flex-column justify-center align-center"
+              Style="height: 100vh; text-align: center;">
+    @if (!_loaded)
+    {
+        <Loading/>
+    }
+    else
+    {
+        <MudStack Spacing="2">
+            <MudText Typo="Typo.h2">Welcome to 3Dictionary!</MudText>
+            <MudText Typo="Typo.body1">
+                Before you begin, let’s set up your library so 3Dictionary knows where to find your files.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Choose Library Location – Pick the main folder where your 3D models will be stored.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Once setup is complete, you’ll be able to browse, search, and manage your 3D models instantly.
+                Please type the root directory for your library.
+            </MudText>
+            <MudText Typo="Typo.body1">
+                Please type the root directory for your library.
+            </MudText>
+            <EditForm Model="_libraryConfiguration" OnValidSubmit="@(() => Submit(_rootDirectory))">
+                <DataAnnotationsValidator/>    
+                <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
+                              @bind-Value="_rootDirectory" InputType="InputType.Text"/>
+                
+                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled"
+                           FullWidth>Submit
+                </MudButton>
+            </EditForm>
+            
+            <MudForm @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors">
+                <MudTextField T="string"
+                              Label="Root Directory"
+                              @bind-Value="_rootDirectory"
+                              Required
+                              RequiredError="Root Directory is required!"
+                              OnlyValidateIfDirty="false"
+                              Variant="Variant.Outlined"
+                              FullWidth
+                              Validation="@(new Func<string, IEnumerable<string>>(ValidateDirectory))"/>
+            </MudForm>
+            <MudButton OnClick="@(() => Submit(_rootDirectory))" Color="Color.Primary" Variant="Variant.Filled"
+                       FullWidth>Submit
+            </MudButton>            
+
+        </MudStack>
+    }
+</MudContainer>
+
+
+@code {
+    private bool _loaded;
+    private string _rootDirectory = string.Empty;
+    private LibraryConfiguration? _libraryConfiguration;
+
+    private MudForm _form;
+    private bool _success;
+    private string[] _errors = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(Globals.DefaultDelay);
+
+        _libraryConfiguration = await LibraryService.GetConfigurationAsync();
+
+        if (_libraryConfiguration is { Initialised: true })
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+
+        _loaded = true;
+    }
+
+    private async Task Submit(string path)
+    {
+        await _form.Validate();
+        if (!_success) return;
+        await LibraryService.UpdateRootDirectory(path);
+        await LibraryService.ToggleInitialised();
+        Snackbar.Add("Default directory set successfully.", Severity.Success);
+        NavigationManager.NavigateTo("/");
+    }
+
+    private IEnumerable<string> ValidateDirectory(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            yield return "Root directory is required!";
+            yield break;
+        }
+        if (!Path.Exists(path) || !Directory.Exists(path))
+        {
+            yield return "The selected path is not a valid directory.";
+        }
+        if (Directory.Exists(path) && Directory.GetFiles(path).Length > 0)
+        {
+            yield return "The selected directory already contains assets. Please choose an empty directory.";
+        }
+    }
+
+}

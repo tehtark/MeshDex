@@ -1,7 +1,9 @@
 ﻿@using ThreeDictionary.Components.Account.Shared
+@using ThreeDictionary.Components.Shared
+
 <Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
-        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
             <NotAuthorized>
                 <RedirectToLogin/>
             </NotAuthorized>

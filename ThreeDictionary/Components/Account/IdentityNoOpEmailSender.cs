@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using ThreeDictionary.Data;
 using ThreeDictionary.Domain.Entities;
 
 namespace ThreeDictionary.Components.Account;
