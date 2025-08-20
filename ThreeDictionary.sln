@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThreeDictionary", "ThreeDictionary\ThreeDictionary.csproj", "{A2C22A88-6E28-44C0-BD5C-AA3C0D1B512C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{A1C58241-4DBC-4BFB-BBBE-DA775A2BFC44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThreeDictionary.Domain", "ThreeDictionary.Domain\ThreeDictionary.Domain.csproj", "{3173834D-C8F3-4528-B550-AB7FD5BBB22A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,12 @@ Global
 		{A2C22A88-6E28-44C0-BD5C-AA3C0D1B512C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A2C22A88-6E28-44C0-BD5C-AA3C0D1B512C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A2C22A88-6E28-44C0-BD5C-AA3C0D1B512C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3173834D-C8F3-4528-B550-AB7FD5BBB22A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3173834D-C8F3-4528-B550-AB7FD5BBB22A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3173834D-C8F3-4528-B550-AB7FD5BBB22A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3173834D-C8F3-4528-B550-AB7FD5BBB22A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3173834D-C8F3-4528-B550-AB7FD5BBB22A} = {A1C58241-4DBC-4BFB-BBBE-DA775A2BFC44}
 	EndGlobalSection
 EndGlobal

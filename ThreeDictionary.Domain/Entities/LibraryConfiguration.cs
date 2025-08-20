@@ -1,4 +1,4 @@
-﻿namespace ThreeDictionary.Entities;
+﻿namespace ThreeDictionary.Domain.Entities;
 
 public class LibraryConfiguration
 {

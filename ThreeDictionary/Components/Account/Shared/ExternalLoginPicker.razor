@@ -3,8 +3,9 @@
 @using MudBlazor
 @using ThreeDictionary.Data
 @using MudBlazor.StaticInput
+@using ThreeDictionary.Domain.Entities
 
-@inject SignInManager<ApplicationUser> SignInManager
+@inject SignInManager<User> SignInManager
 @inject IdentityRedirectManager RedirectManager
 
 @if (externalLogins.Length == 0)

@@ -7,6 +7,7 @@ using Serilog.Events;
 using ThreeDictionary.Components;
 using ThreeDictionary.Components.Account;
 using ThreeDictionary.Data;
+using ThreeDictionary.Domain.Entities;
 using ThreeDictionary.Extensions;
 
 namespace ThreeDictionary;
@@ -41,12 +42,12 @@ public class Program
             options.UseSqlite(connectionString));
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-        builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+        builder.Services.AddIdentityCore<User>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
 
-        builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+        builder.Services.AddSingleton<IEmailSender<User>, IdentityNoOpEmailSender>();
 
         builder.Services.AddThreeDictionary();
 
