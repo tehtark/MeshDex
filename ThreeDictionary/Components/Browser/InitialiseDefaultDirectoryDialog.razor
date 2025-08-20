@@ -1,0 +1,19 @@
+﻿@using ThreeDictionary.Components.File
+@inject ISnackbar Snackbar
+<MudDialog Style="align-items: center; justify-content: center;">
+    <DialogContent>
+        <ServerFolderPicker/>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance MudDialog { get; set; }
+
+    private IList<IBrowserFile> _files = new List<IBrowserFile>();
+
+    private void Submit(IBrowserFile file)
+    {
+        
+    }
+
+}

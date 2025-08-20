@@ -1,0 +1,37 @@
+﻿@page "/"
+@inject IDialogService DialogService
+@using ThreeDictionary.Components.Utilities
+@using ThreeDictionary.Components.Browser
+
+@if (!_loaded)
+{
+    <Loading/>
+}
+else
+{
+    <FileBrowser/>
+}
+
+@code{
+
+    private bool _loaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(Globals.DefaultDelay);
+        if (string.IsNullOrEmpty(Globals.DefaultDictionaryPath))
+        {
+            var options = new DialogOptions
+            {
+                CloseButton = false,
+                MaxWidth = MaxWidth.ExtraLarge,
+                FullWidth = true,
+                BackdropClick = false,
+            };
+            await DialogService.ShowAsync<InitialiseDefaultDirectoryDialog>("", options);
+        }
+
+        _loaded = true;
+    }
+
+}

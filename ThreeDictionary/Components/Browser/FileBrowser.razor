@@ -1,0 +1,50 @@
+﻿@inject IDialogService DialogService
+
+<div style="padding-top: 20px;">
+    <MudAppBar Dense="true" Gutters="false" Class="height-20">
+        <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" Class="height-20">
+            <MudMenu Variant="Variant.Text" RelativeWidth="DropdownWidth.Adaptive" Class="height-20" Style="width:min-content" Dense="true" Label="File">
+                <MudMenuItem Class="height-20" Label="New" OnClick="@OnNewFile" />
+            </MudMenu>
+        </MudStack>
+    </MudAppBar>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
+        @for (int i = 0; i < count; i++)
+        {
+            <MudPaper Height="140px" Width="100%" Class="d-flex justify-center align-center">
+                Model
+            </MudPaper>
+        }
+    </div>
+</div>
+
+<style>
+    .height-20 {
+        height: 20px;
+        min-height: 20px;
+    }
+</style>
+
+
+@code {
+    int count = 100;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(Globals.DefaultDelay);
+    }
+
+    private async Task OnNewFile()
+    {
+
+        await DialogService.ShowAsync<AddNewModelDialog>("Add New Model", new DialogOptions()
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.ExtraSmall,
+            FullWidth = true,
+            BackdropClick = false
+        });
+    }
+
+}

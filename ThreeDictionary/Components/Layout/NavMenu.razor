@@ -1,0 +1,61 @@
+﻿@implements IDisposable
+
+@inject NavigationManager NavigationManager
+
+<MudStack Justify="Justify.SpaceBetween" Spacing="0" Class="stack-adorner h-100">
+    <MudStack Spacing="0" AlignItems="AlignItems.Stretch" Class="h-100">
+        <MudButton Href="/" Color="Color.Inherit" Class="btn-square-fit rounded-0" Style="min-width:0;">
+            <MudIcon Icon="@Icons.Material.Outlined.Folder"/>
+        </MudButton>
+
+        <MudButton Href="/settings" Color="Color.Inherit" Class="btn-square-fit rounded-0" Style="min-width:0;">
+            <MudIcon Icon="@Icons.Material.Outlined.Settings"/>
+        </MudButton>
+        
+        <MudSpacer/>
+        
+        <MudButton Href="/account/manage" Color="Color.Inherit" Class="btn-square-fit rounded-0" Style="min-width:0;">
+            <MudIcon Icon="@Icons.Material.Outlined.AccountCircle"/>
+        </MudButton>
+
+
+    </MudStack>
+</MudStack>
+
+<style>
+    .stack-adorner {
+        height: 56px;
+    }
+
+    .btn-square-fit {
+        height: 100%;
+        aspect-ratio: 1 / 1;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        min-width: 0;
+    }
+</style>
+
+
+@code {
+    private string? currentUrl;
+
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+}

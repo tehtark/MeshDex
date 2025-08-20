@@ -1,0 +1,54 @@
+﻿@using ThreeDictionary.Services
+@using File = System.IO.File
+@inject FileService FileService
+
+@if (_items != null && _items.Count > 0)
+{
+    <div style="height: 100vw; width: 100vh; overflow: auto;">
+        <MudDataGrid Dense="true" Items="@_items">
+            <Columns>
+                <PropertyColumn Property="x => x" Title="Name"/>
+            </Columns>
+        </MudDataGrid>
+    </div>
+}
+else
+{
+    <MudText>No directories found.</MudText>
+}
+
+
+@code
+{
+    private string _currentPath;
+    private List<string> _items = new();
+    private string _selectedDirectory = "";
+
+    protected override Task OnInitializedAsync()
+    {
+        _currentPath = FileService.DefaultPath;
+
+        var files = FileService.GetFiles(_currentPath);
+        var directories = FileService.GetDirectories(_currentPath);
+
+        foreach (var directory in directories)
+        {
+            _items.Add(directory);
+        }
+
+        foreach (var file in files)
+        {
+            _items.Add(file);
+        }
+
+
+        return base.OnInitializedAsync();
+    }
+
+    private void OnPathChanged(string newPath)
+    {
+        _currentPath = newPath;
+        _items = FileService.GetDirectories(_currentPath);
+        _selectedDirectory = ""; // Reset selection when path changes
+    }
+}
