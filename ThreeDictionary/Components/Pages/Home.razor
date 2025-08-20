@@ -1,6 +1,5 @@
 ﻿@page "/"
 @inject IDialogService DialogService
-@using ThreeDictionary.Components.Utilities
 @using ThreeDictionary.Components.Browser
 
 @if (!_loaded)
@@ -14,21 +13,14 @@ else
 
 @code{
 
-    private bool _loaded = false;
+    private bool _loaded;
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(Globals.DefaultDelay);
-        if (string.IsNullOrEmpty(Globals.DefaultDictionaryPath))
+        if (string.IsNullOrEmpty(Globals.LibraryPath))
         {
-            var options = new DialogOptions
-            {
-                CloseButton = false,
-                MaxWidth = MaxWidth.ExtraLarge,
-                FullWidth = true,
-                BackdropClick = false,
-            };
-            await DialogService.ShowAsync<InitialiseDefaultDirectoryDialog>("", options);
+            await DialogService.ShowAsync<InitialiseDefaultDirectoryDialog>();
         }
 
         _loaded = true;

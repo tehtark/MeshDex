@@ -7,6 +7,12 @@
 }
 else
 {
+    // form to show where the library "Assets" folder is located.
+    <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="h-100">
+        <MudText Typo="Typo.h5">Settings</MudText>
+        <MudTextField @bind-Value="Globals.LibraryPath" Label="Default Dictionary Path" Variant="Variant.Outlined" FullWidth Required />
+        <MudButton OnClick="@(() => SaveSettings())" Color="Color.Primary" Variant="Variant.Filled" FullWidth>Save Settings</MudButton>
+    </MudStack>
 }
 
 @code{
@@ -16,18 +22,12 @@ else
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(Globals.DefaultDelay);
-        // if (string.IsNullOrEmpty(Globals.DefaultDictionaryPath))
-        // {
-        //     var options = new DialogOptions
-        //     {
-        //         CloseButton = false,
-        //         MaxWidth = MaxWidth.ExtraSmall,
-        //         FullWidth = true,
-        //         BackdropClick = false,
-        //     };
-        //     await DialogService.ShowAsync<InitialiseDefaultDirectoryDialog>("", options);
-        // }
 
-        // _loaded = true;
+        _loaded = true;
+    }
+
+    private void SaveSettings()
+    {
+        
     }
 }
