@@ -26,7 +26,6 @@ public static class InfrastructureExtension
         
         await db.Database.MigrateAsync();
 
-
         // Check if the configuration already exists
         var configuration = await db.LibraryConfigurations.FirstOrDefaultAsync(c => c.Id == 1);
 

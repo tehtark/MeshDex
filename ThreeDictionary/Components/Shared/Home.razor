@@ -1,8 +1,10 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Authorization
 @using ThreeDictionary.Application.Services
 @using ThreeDictionary.Components.Browser
 @inject NavigationManager NavigationManager
 @inject LibraryService LibraryService
+@attribute [Authorize]
 
 <PageTitle>3Dictionary</PageTitle>
 

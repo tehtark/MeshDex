@@ -1,10 +1,12 @@
 ﻿@page "/setup"
 @layout SetupLayout
+@using Microsoft.AspNetCore.Authorization
 @using ThreeDictionary.Application.Services
 @using ThreeDictionary.Domain.Entities
 @inject ISnackbar Snackbar
 @inject LibraryService LibraryService
 @inject NavigationManager NavigationManager
+@attribute [Authorize]
 
 <PageTitle>Setup</PageTitle>
 

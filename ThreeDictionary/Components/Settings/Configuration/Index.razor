@@ -1,12 +1,11 @@
 ﻿@page "/settings/configuration"
 @layout SettingsLayout
+@using Microsoft.AspNetCore.Authorization
 @using ThreeDictionary.Application.Services
 @using ThreeDictionary.Components.Settings.Shared
 @using ThreeDictionary.Domain.Entities
-@using ThreeDictionary.Infrastructure.Data
-@inject ApplicationDbContext DbContext
 @inject LibraryService LibraryService
-
+@attribute [Authorize]
 
 @if (!_loaded)
 {
