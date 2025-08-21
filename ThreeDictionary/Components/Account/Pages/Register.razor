@@ -7,7 +7,6 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using ThreeDictionary.Domain.Entities
-@using ThreeDictionary.Domain.Enums
 
 @inject UserManager<User> UserManager
 @inject IUserStore<User> UserStore
@@ -17,7 +16,7 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-@attribute [Authorize(Roles = UserRoles.Admin)]
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Register</PageTitle>
 

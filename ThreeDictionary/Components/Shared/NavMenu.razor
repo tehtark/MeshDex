@@ -1,5 +1,4 @@
-﻿@using ThreeDictionary.Domain.Enums
-@implements IDisposable
+﻿@implements IDisposable
 
 @inject NavigationManager NavigationManager
 
@@ -15,7 +14,7 @@
 <MudSpacer/>
 
 <MudStack Spacing="0">
-    <AuthorizeView Roles="@UserRoles.Admin">
+    <AuthorizeView Roles="Admin">
         <Authorized>
             <MudButton Href="/settings/configuration" Color="Color.Inherit" Class="btn-square-fit">
                 <MudIcon Icon="@Icons.Material.Outlined.Settings"/>

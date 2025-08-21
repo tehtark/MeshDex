@@ -7,7 +7,6 @@ using ThreeDictionary.Application;
 using ThreeDictionary.Components;
 using ThreeDictionary.Components.Account;
 using ThreeDictionary.Domain.Entities;
-using ThreeDictionary.Domain.Enums;
 using ThreeDictionary.Infrastructure;
 using ThreeDictionary.Infrastructure.Data;
 
@@ -109,7 +108,7 @@ public class Program
     private static async Task CreateRolesAsync(IServiceProvider serviceProvider)
     {
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        string[] roles = [UserRoles.Admin];
+        string[] roles = ["Admin"];
 
         foreach (var role in roles)
         {
@@ -146,7 +145,7 @@ public class Program
             var result = await userManager.CreateAsync(user, password);
             if (result.Succeeded)
             {
-                await userManager.AddToRoleAsync(user, UserRoles.Admin);
+                await userManager.AddToRoleAsync(user, "Admin");
             }
         }
     }
