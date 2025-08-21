@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.EntityFrameworkCore;
 using ThreeDictionary.Domain.Entities;
 using ThreeDictionary.Infrastructure.Data;
 
@@ -12,6 +10,7 @@ public class LibraryConfigurationService(ApplicationDbContext dbContext)
     {
         return await dbContext.LibraryConfigurations.FirstOrDefaultAsync();
     }
+
     public async Task<bool> UpdateRootDirectory(string path)
     {
         var configuration = await GetConfigurationAsync();

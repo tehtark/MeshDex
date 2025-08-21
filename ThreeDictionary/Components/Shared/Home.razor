@@ -24,14 +24,14 @@ else
     protected override async Task OnInitializedAsync()
     {
         var libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync();
-        
-        if(libraryConfiguration is { Initialised: false })
+
+        if (libraryConfiguration is { Initialised: false })
         {
             NavigationManager.NavigateTo("/setup");
         }
-        
+
         await Task.Delay(Globals.DefaultDelay);
-        
+
         _loaded = true;
     }
 

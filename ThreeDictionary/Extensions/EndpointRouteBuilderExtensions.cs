@@ -1,4 +1,4 @@
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -11,9 +11,14 @@ using ThreeDictionary.Components.Account.Pages.Manage;
 using ThreeDictionary.Domain.Entities;
 
 namespace ThreeDictionary.Extensions;
-internal static class IdentityComponentsEndpointRouteBuilderExtensions
+
+// Central endpoint extensions for the application. Contains Identity-related endpoint mappings
+// required by the Identity Razor components under /Components/Account/Pages.
+internal static class EndpointRouteBuilderExtensions
 {
-    // These endpoints are required by the Identity Razor components defined in the /Components/Account/Pages directory of this project.
+    /// <summary>
+    /// Maps endpoints required by the Identity Razor components defined in /Components/Account/Pages.
+    /// </summary>
     public static IEndpointConventionBuilder MapAdditionalIdentityEndpoints(this IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
@@ -78,10 +83,7 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
             [FromServices] AuthenticationStateProvider authenticationStateProvider) =>
         {
             var user = await userManager.GetUserAsync(context.User);
-            if (user is null)
-            {
-                return Results.NotFound($"Unable to load user with ID '{userManager.GetUserId(context.User)}'.");
-            }
+            if (user is null) return Results.NotFound($"Unable to load user with ID '{userManager.GetUserId(context.User)}'.");
 
             var userId = await userManager.GetUserIdAsync(user);
             downloadLogger.LogInformation("User with ID '{UserId}' asked for their personal data.", userId);
@@ -89,22 +91,16 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
             // Only include personal data for download
             var personalData = new Dictionary<string, string>();
             var personalDataProps = typeof(User).GetProperties().Where(prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));
-            foreach (var p in personalDataProps)
-            {
-                personalData.Add(p.Name, p.GetValue(user)?.ToString() ?? "null");
-            }
+            foreach (var p in personalDataProps) personalData.Add(p.Name, p.GetValue(user)?.ToString() ?? "null");
 
             var logins = await userManager.GetLoginsAsync(user);
-            foreach (var l in logins)
-            {
-                personalData.Add($"{l.LoginProvider} external login provider key", l.ProviderKey);
-            }
+            foreach (var l in logins) personalData.Add($"{l.LoginProvider} external login provider key", l.ProviderKey);
 
             personalData.Add("Authenticator Key", (await userManager.GetAuthenticatorKeyAsync(user))!);
             var fileBytes = JsonSerializer.SerializeToUtf8Bytes(personalData);
 
             context.Response.Headers.TryAdd("Content-Disposition", "attachment; filename=PersonalData.json");
-            return TypedResults.File(fileBytes, contentType: "application/json", fileDownloadName: "PersonalData.json");
+            return TypedResults.File(fileBytes, "application/json", "PersonalData.json");
         });
 
         return accountGroup;

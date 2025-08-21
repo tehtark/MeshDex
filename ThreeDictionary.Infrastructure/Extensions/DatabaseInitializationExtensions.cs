@@ -10,17 +10,14 @@ namespace ThreeDictionary.Infrastructure.Extensions;
 public static class DatabaseInitializationExtensions
 {
     /// <summary>
-    /// Applies pending migrations and seeds baseline data in a safe, idempotent way.
+    ///     Applies pending migrations and seeds baseline data in a safe, idempotent way.
     /// </summary>
     public static async Task InitialiseDatabaseAsync(this IServiceProvider services, CancellationToken ct = default)
     {
         // Ensure the application data directory exists before EF tries to create/open the SQLite file
         var appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var appdataDirectory = Path.Combine(appdataPath, "ThreeDictionary");
-        if (!Directory.Exists(appdataDirectory))
-        {
-            Directory.CreateDirectory(appdataDirectory);
-        }
+        if (!Directory.Exists(appdataDirectory)) Directory.CreateDirectory(appdataDirectory);
 
         using var scope = services.CreateScope();
         var sp = scope.ServiceProvider;
@@ -45,7 +42,7 @@ public static class DatabaseInitializationExtensions
             {
                 Id = 1,
                 RootDirectory = string.Empty,
-                Initialised = false,
+                Initialised = false
             });
             await db.SaveChangesAsync(ct);
         }
@@ -53,10 +50,7 @@ public static class DatabaseInitializationExtensions
         // Seed Identity: Admin role and Admin user (idempotent)
         var roleManager = sp.GetRequiredService<RoleManager<IdentityRole>>();
         const string adminRole = "Admin";
-        if (!await roleManager.RoleExistsAsync(adminRole))
-        {
-            await roleManager.CreateAsync(new IdentityRole(adminRole));
-        }
+        if (!await roleManager.RoleExistsAsync(adminRole)) await roleManager.CreateAsync(new IdentityRole(adminRole));
 
         var userManager = sp.GetRequiredService<UserManager<User>>();
         var adminEmail = config?["Admin:Email"] ?? "admin@example.com";
@@ -68,20 +62,14 @@ public static class DatabaseInitializationExtensions
             {
                 UserName = adminEmail,
                 Email = adminEmail,
-                EmailConfirmed = true,
+                EmailConfirmed = true
             };
             var createResult = await userManager.CreateAsync(adminUser, adminPassword);
-            if (createResult.Succeeded)
-            {
-                await userManager.AddToRoleAsync(adminUser, adminRole);
-            }
+            if (createResult.Succeeded) await userManager.AddToRoleAsync(adminUser, adminRole);
         }
         else
         {
-            if (!await userManager.IsInRoleAsync(existingUser, adminRole))
-            {
-                await userManager.AddToRoleAsync(existingUser, adminRole);
-            }
+            if (!await userManager.IsInRoleAsync(existingUser, adminRole)) await userManager.AddToRoleAsync(existingUser, adminRole);
         }
     }
 }

@@ -20,21 +20,21 @@ public class LibraryCategoryService(ApplicationDbContext dbContext)
     {
         return await dbContext.LibraryCategories.FirstOrDefaultAsync(c => c.Name == name);
     }
-    
+
     public async Task<LibraryCategory> CreateCategoryAsync(LibraryCategory category)
     {
         dbContext.LibraryCategories.Add(category);
         await dbContext.SaveChangesAsync();
         return category;
     }
-    
+
     public async Task<LibraryCategory> UpdateCategoryAsync(LibraryCategory category)
     {
         dbContext.LibraryCategories.Update(category);
         await dbContext.SaveChangesAsync();
         return category;
     }
-    
+
     public async Task DeleteCategoryAsync(int id)
     {
         var category = await dbContext.LibraryCategories.FindAsync(id);
@@ -44,6 +44,7 @@ public class LibraryCategoryService(ApplicationDbContext dbContext)
             await dbContext.SaveChangesAsync();
         }
     }
+
     public async Task DeleteCategoryAsync(string name)
     {
         var category = await dbContext.LibraryCategories.FirstOrDefaultAsync(c => c.Name == name);
@@ -53,13 +54,14 @@ public class LibraryCategoryService(ApplicationDbContext dbContext)
             await dbContext.SaveChangesAsync();
         }
     }
+
     public async Task<bool> CategoryExistsAsync(int id)
     {
         return await dbContext.LibraryCategories.AnyAsync(c => c.Id == id);
     }
+
     public async Task<bool> CategoryExistsAsync(string name)
     {
         return await dbContext.LibraryCategories.AnyAsync(c => c.Name == name);
     }
-    
 }

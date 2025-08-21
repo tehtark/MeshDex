@@ -1,9 +1,9 @@
 ﻿@page "/settings/categories"
-@layout SettingsLayout
 @using Microsoft.AspNetCore.Authorization
 @using ThreeDictionary.Application.Services
 @using ThreeDictionary.Components.Settings.Shared
 @using ThreeDictionary.Domain.Entities
+@layout SettingsLayout
 @attribute [Authorize]
 @inject LibraryCategoryService LibraryCategoryService
 
@@ -24,7 +24,7 @@ else
     else
     {
         <MudDataGrid Items="@_categories">
-            
+
             <Columns>
                 <PropertyColumn Property=" x => x.Id"></PropertyColumn>
                 <PropertyColumn Property=" x => x.Name"></PropertyColumn>

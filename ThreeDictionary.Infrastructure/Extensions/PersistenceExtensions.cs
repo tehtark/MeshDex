@@ -7,7 +7,7 @@ namespace ThreeDictionary.Infrastructure.Extensions;
 public static class PersistenceExtensions
 {
     /// <summary>
-    /// Registers the EF Core DbContext and configures the database provider.
+    ///     Registers the EF Core DbContext and configures the database provider.
     /// </summary>
     public static IServiceCollection AddPersistence(this IServiceCollection services)
     {

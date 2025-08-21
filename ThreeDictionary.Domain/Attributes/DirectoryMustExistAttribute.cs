@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using ThreeDictionary.Domain.Entities;
 
 namespace ThreeDictionary.Domain.Attributes;
 
-[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
 public class DirectoryMustExistAttribute : ValidationAttribute
 {
     protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)

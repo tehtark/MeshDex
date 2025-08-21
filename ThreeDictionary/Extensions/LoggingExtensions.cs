@@ -3,7 +3,7 @@ using Serilog.Events;
 
 namespace ThreeDictionary.Extensions;
 
-public static class SerilogExtensions
+public static class LoggingExtensions
 {
     public static WebApplicationBuilder AddSerilogLogging(this WebApplicationBuilder app)
     {
@@ -26,5 +26,4 @@ public static class SerilogExtensions
         Log.Debug("Logger: Initialised.");
         return app;
     }
-
 }

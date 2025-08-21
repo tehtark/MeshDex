@@ -1,10 +1,8 @@
 ﻿@page "/setup"
-@layout SetupLayout
-@using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authorization
 @using ThreeDictionary.Application.Services
-@using ThreeDictionary.Domain.Attributes
 @using ThreeDictionary.Domain.Entities
+@layout SetupLayout
 @inject ISnackbar Snackbar
 @inject LibraryConfigurationService LibraryConfigurationService
 @inject NavigationManager NavigationManager
@@ -39,11 +37,11 @@
             <EditForm Model="_libraryConfiguration" OnSubmit="Submit">
                 <DataAnnotationsValidator/>
                 <ValidationSummary/>
-                <MudTextField Label="Root Directory" 
-                              HelperText="Example: C:/Assets " 
+                <MudTextField Label="Root Directory"
+                              HelperText="Example: C:/Assets "
                               Class="mt-3"
-                              @bind-Value="_libraryConfiguration.RootDirectory" 
-                              For="() => _libraryConfiguration.RootDirectory" 
+                              @bind-Value="_libraryConfiguration.RootDirectory"
+                              For="() => _libraryConfiguration.RootDirectory"
                               InputType="InputType.Text"
                               OnlyValidateIfDirty="false"
                               Immediate="true"/>
@@ -86,4 +84,5 @@
         Snackbar.Add("Default directory set successfully.", Severity.Success);
         NavigationManager.NavigateTo("/");
     }
+
 }

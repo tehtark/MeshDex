@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
-using ThreeDictionary.Components;
 using ThreeDictionary.Components.Account;
 
 namespace ThreeDictionary.Extensions;
@@ -11,7 +10,7 @@ public static class PresentationExtensions
     {
         services.AddMudServices();
         services.AddRazorComponents().AddInteractiveServerComponents();
-        
+
         services.AddCascadingAuthenticationState();
         services.AddScoped<IdentityUserAccessor>();
         services.AddScoped<IdentityRedirectManager>();
