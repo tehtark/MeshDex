@@ -86,7 +86,7 @@ public class Program
 
     private static void InitialiseLogger(WebApplicationBuilder builder)
     {
-        builder.Host.UseSerilog((context, logger) =>
+        builder.Host.UseSerilog((_, logger) =>
         {
 #if DEBUG
             logger.MinimumLevel.Is(LogEventLevel.Debug)
