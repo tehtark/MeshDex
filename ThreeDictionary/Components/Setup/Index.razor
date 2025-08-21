@@ -63,8 +63,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.Delay(Globals.DefaultDelay);
-
         _libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync();
 
         if (_libraryConfiguration is { Initialised: true })

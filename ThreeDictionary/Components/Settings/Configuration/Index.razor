@@ -33,7 +33,6 @@ else
     protected override async Task OnInitializedAsync()
     {
         _libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync();
-        await Task.Delay(Globals.DefaultDelay);
 
         _loaded = true;
     }

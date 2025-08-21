@@ -39,7 +39,6 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await Task.Delay(Globals.DefaultDelay);
         _categories = await LibraryCategoryService.GetCategoriesAsync();
         _loaded = true;
     }

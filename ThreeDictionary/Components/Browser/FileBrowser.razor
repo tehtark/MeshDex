@@ -11,7 +11,7 @@
     </MudAppBar>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
-        @for (var i = 0; i < count; i++)
+        @for (var i = 0; i < _count; i++)
         {
             <MudPaper Height="140px" Width="100%" Class="d-flex justify-center align-center">
                 Model
@@ -29,12 +29,7 @@
 
 
 @code {
-    readonly int count = 100;
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Task.Delay(Globals.DefaultDelay);
-    }
+    private readonly int _count = 100;
 
     private async Task OnNewFile()
     {
