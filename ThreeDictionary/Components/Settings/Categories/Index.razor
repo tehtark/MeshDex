@@ -23,12 +23,11 @@ else
     }
     else
     {
-        <MudDataGrid T="LibraryCategory" Data="@_categories">
+        <MudDataGrid Items="@_categories">
             <Columns>
                 <PropertyColumn Property=" x => x.Id"></PropertyColumn>
                 <PropertyColumn Property=" x => x.Name"></PropertyColumn>
             </Columns>
-
         </MudDataGrid>
     }
 }

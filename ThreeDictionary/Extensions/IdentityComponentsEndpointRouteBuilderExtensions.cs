@@ -10,8 +10,7 @@ using ThreeDictionary.Components.Account.Pages;
 using ThreeDictionary.Components.Account.Pages.Manage;
 using ThreeDictionary.Domain.Entities;
 
-namespace Microsoft.AspNetCore.Routing;
-
+namespace ThreeDictionary.Extensions;
 internal static class IdentityComponentsEndpointRouteBuilderExtensions
 {
     // These endpoints are required by the Identity Razor components defined in the /Components/Account/Pages directory of this project.

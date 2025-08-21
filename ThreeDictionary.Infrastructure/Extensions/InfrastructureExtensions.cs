@@ -3,12 +3,14 @@ using Microsoft.Extensions.DependencyInjection;
 using ThreeDictionary.Domain.Entities;
 using ThreeDictionary.Infrastructure.Data;
 
-namespace ThreeDictionary.Infrastructure;
+namespace ThreeDictionary.Infrastructure.Extensions;
 
-public static class InfrastructureExtension
+public static class InfrastructureExtensions
 {
     public static async Task<IServiceCollection> AddInfrastructure(this IServiceCollection services)
     {
+        services.AddIdentityAndAuth();
+        
         // Ensure the application data directory exists.
         var appdataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
         var appdataDirectory = Path.Combine(appdataPath, "ThreeDictionary");
