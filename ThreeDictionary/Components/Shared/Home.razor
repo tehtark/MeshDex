@@ -3,7 +3,7 @@
 @using ThreeDictionary.Application.Services
 @using ThreeDictionary.Components.Browser
 @inject NavigationManager NavigationManager
-@inject LibraryService LibraryService
+@inject LibraryConfigurationService LibraryConfigurationService
 @attribute [Authorize]
 
 <PageTitle>3Dictionary</PageTitle>
@@ -23,7 +23,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var libraryConfiguration = await LibraryService.GetConfigurationAsync();
+        var libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync();
         
         if(libraryConfiguration is { Initialised: false })
         {

@@ -1,9 +1,48 @@
 ﻿@page "/settings/categories"
 @layout SettingsLayout
 @using Microsoft.AspNetCore.Authorization
+@using ThreeDictionary.Application.Services
 @using ThreeDictionary.Components.Settings.Shared
+@using ThreeDictionary.Domain.Entities
 @attribute [Authorize]
+@inject LibraryCategoryService LibraryCategoryService
+
+@*
+Create a datagrid to display and manage categories.
+This page will allow users to view, add, edit, and delete categories.
+*@
+@if (!_loaded)
+{
+    <Loading/>
+}
+else
+{
+    @if (_categories.Count == 0)
+    {
+        <MudText Typo="Typo.h6" Class="mt-3">No categories found. Please add a new category.</MudText>
+    }
+    else
+    {
+        <MudDataGrid T="LibraryCategory" Data="@_categories">
+            <Columns>
+                <PropertyColumn Property=" x => x.Id"></PropertyColumn>
+                <PropertyColumn Property=" x => x.Name"></PropertyColumn>
+            </Columns>
+
+        </MudDataGrid>
+    }
+}
 
 @code {
-    
+    List<LibraryCategory?> _categories = [];
+    private bool _loaded = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(Globals.DefaultDelay);
+        _categories = await LibraryCategoryService.GetCategoriesAsync();
+        _loaded = true;
+    }
+
 }
+

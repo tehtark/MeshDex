@@ -4,7 +4,7 @@
 @using ThreeDictionary.Application.Services
 @using ThreeDictionary.Components.Settings.Shared
 @using ThreeDictionary.Domain.Entities
-@inject LibraryService LibraryService
+@inject LibraryConfigurationService LibraryConfigurationService
 @attribute [Authorize]
 
 @if (!_loaded)
@@ -31,7 +31,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _libraryConfiguration = await LibraryService.GetConfigurationAsync();
+        _libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync();
         await Task.Delay(Globals.DefaultDelay);
 
         _loaded = true;

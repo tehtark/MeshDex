@@ -6,23 +6,12 @@ using ThreeDictionary.Infrastructure.Data;
 
 namespace ThreeDictionary.Application.Services;
 
-public class LibraryService(ApplicationDbContext dbContext) : BackgroundService
+public class LibraryConfigurationService(ApplicationDbContext dbContext)
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        var configuration = await GetConfigurationAsync();
-
-        while (!stoppingToken.IsCancellationRequested && string.IsNullOrEmpty(configuration?.RootDirectory))
-        {
-            await Task.Delay(1000, stoppingToken);
-        }
-    }
-
     public async Task<LibraryConfiguration?> GetConfigurationAsync()
     {
         return await dbContext.LibraryConfigurations.FirstOrDefaultAsync();
     }
-
     public async Task<bool> UpdateRootDirectory(string path)
     {
         var configuration = await GetConfigurationAsync();

@@ -6,7 +6,7 @@
 @using ThreeDictionary.Domain.Attributes
 @using ThreeDictionary.Domain.Entities
 @inject ISnackbar Snackbar
-@inject LibraryService LibraryService
+@inject LibraryConfigurationService LibraryConfigurationService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
 
@@ -67,7 +67,7 @@
     {
         await Task.Delay(Globals.DefaultDelay);
 
-        _libraryConfiguration = await LibraryService.GetConfigurationAsync();
+        _libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync();
 
         if (_libraryConfiguration is { Initialised: true })
         {
@@ -81,8 +81,8 @@
     private async Task Submit()
     {
         var path = _libraryConfiguration!.RootDirectory?.Trim() ?? string.Empty;
-        await LibraryService.UpdateRootDirectory(path);
-        await LibraryService.ToggleInitialised();
+        await LibraryConfigurationService.UpdateRootDirectory(path);
+        await LibraryConfigurationService.ToggleInitialised();
         Snackbar.Add("Default directory set successfully.", Severity.Success);
         NavigationManager.NavigateTo("/");
     }
