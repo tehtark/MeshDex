@@ -4,44 +4,142 @@
 @using ThreeDictionary.Components.Settings.Shared
 @using ThreeDictionary.Domain.Entities
 @layout SettingsLayout
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Admin")]
 @inject LibraryCategoryService LibraryCategoryService
+@inject IDialogService DialogService
 
-@*
-Create a datagrid to display and manage categories.
-This page will allow users to view, add, edit, and delete categories.
-*@
+<PageTitle>Categories</PageTitle>
+
 @if (!_loaded)
 {
-    <Loading/>
+    <Loading />
 }
 else
 {
+    <MudStack Row AlignItems="AlignItems.Center" Class="mt-2">
+        <MudText Typo="Typo.h5">Categories</MudText>
+        <MudSpacer />
+        <span @ref="_addAnchor">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="ToggleAddPopover">
+                Add Category
+            </MudButton>
+        </span>
+        <span @ref="_editAnchor"></span>
+    </MudStack>
+
+    <NewCategoryPopover Open="@_addOpen" AnchorEl="@_addAnchor" Categories="@_categories" OnClose="CloseAddPopover" OnCreated="OnCategoryCreatedAsync" />
+
+    <EditCategoryPopover Open="@_editOpen" AnchorEl="@_editAnchor" Categories="@_categories" Category="@_selectedCategory" OnClose="CloseEditPopover" OnSaved="OnCategorySavedAsync" />
+
     @if (_categories.Count == 0)
     {
-        <MudText Typo="Typo.h6" Class="mt-3">No categories found. Please add a new category.</MudText>
+        <MudAlert Severity="Severity.Info" Class="mt-3">No categories found. Please add a new category.</MudAlert>
     }
     else
     {
-        <MudDataGrid Items="@_categories">
-
-            <Columns>
-                <PropertyColumn Property=" x => x.Id"></PropertyColumn>
-                <PropertyColumn Property=" x => x.Name"></PropertyColumn>
-            </Columns>
-        </MudDataGrid>
+        <CategoryDataGrid Items="@_categories" OnEditRequested="OpenEditPopover" OnDeleteRequested="ConfirmDeleteAsync" />
     }
 }
 
 @code {
-    List<LibraryCategory> _categories = [];
+    private List<LibraryCategory> _categories = new();
     private bool _loaded;
+
+    // Add popover state
+    private bool _addOpen;
+    private ElementReference _addAnchor;
+
+    // Edit popover state
+    private bool _editOpen;
+    private ElementReference _editAnchor;
+    private LibraryCategory? _selectedCategory;
 
     protected override async Task OnInitializedAsync()
     {
-        _categories = await LibraryCategoryService.GetCategoriesAsync();
-        _loaded = true;
+        await LoadAsync();
     }
 
+    private async Task LoadAsync()
+    {
+        _categories = await LibraryCategoryService.GetCategoriesAsync();
+        _loaded = true;
+        StateHasChanged();
+    }
+
+    private void ToggleAddPopover()
+    {
+        _addOpen = !_addOpen;
+    }
+
+    private void CloseAddPopover()
+    {
+        _addOpen = false;
+    }
+
+    private async Task OnCategoryCreatedAsync()
+    {
+        await LoadAsync();
+        CloseAddPopover();
+    }
+
+    private string GetParentName(int? parentId)
+    {
+        if (parentId is not int id) return "—";
+        return _categories.FirstOrDefault(c => c.Id == id)?.Name ?? "—";
+    }
+
+    private async Task ConfirmDeleteAsync(LibraryCategory category)
+    {
+        var hasChildren = await LibraryCategoryService.HasChildrenAsync(category.Id);
+        var childrenNote = hasChildren ? "<br/><b>Note:</b> This category has child categories which will also be deleted." : string.Empty;
+        bool? result = await DialogService.ShowMessageBox(
+            title: "Delete Category",
+            markupMessage: (MarkupString)$"Are you sure you want to delete '<b>{category.Name}</b>'?<br/><br/><b>Warning:</b> This will also delete the corresponding folder and <b>all files inside it</b> from disk. This action cannot be undone.{childrenNote}",
+            yesText: "Delete",
+            noText: "Cancel",
+            options: new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center }
+        );
+
+        if (result == true)
+        {
+            await DeleteCategoryAsync(category);
+        }
+    }
+
+    private async Task DeleteCategoryAsync(LibraryCategory category)
+    {
+        try
+        {
+            await LibraryCategoryService.DeleteCategoryAsync(category.Id);
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            await DialogService.ShowMessageBox(
+                title: "Delete Failed",
+                markupMessage: (MarkupString)$"An error occurred while deleting the category: <br/><br/><code>{ex.Message}</code>",
+                yesText: "OK",
+                options: new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center }
+            );
+        }
+    }
+
+    private void OpenEditPopover(LibraryCategory category)
+    {
+        _selectedCategory = category;
+        _editOpen = true;
+    }
+
+    private void CloseEditPopover()
+    {
+        _editOpen = false;
+        _selectedCategory = null;
+    }
+
+    private async Task OnCategorySavedAsync()
+    {
+        await LoadAsync();
+        CloseEditPopover();
+    }
 }
 

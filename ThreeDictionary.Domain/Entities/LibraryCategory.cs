@@ -1,9 +1,10 @@
-﻿namespace ThreeDictionary.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ThreeDictionary.Domain.Entities;
 
 public class LibraryCategory
 {
+    [Key] [Required] public int Id { get; set; }
+    [Required] public string Name { get; set; } = string.Empty;
     public int? ParentId { get; set; }
-    public int? ChildId { get; set; }
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
 }
