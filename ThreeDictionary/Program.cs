@@ -91,8 +91,8 @@ public class Program
         {
 #if DEBUG
             logger.MinimumLevel.Is(LogEventLevel.Debug)
-                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Debug) // Filter specific namespace
-                .MinimumLevel.Override("MudBlazor", LogEventLevel.Debug) // Filter specific namespace
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning) // Filter specific namespace
+                .MinimumLevel.Override("MudBlazor", LogEventLevel.Warning) // Filter specific namespace
                 .WriteTo.File(AppDomain.CurrentDomain.BaseDirectory + "/logs/log.json", rollingInterval: RollingInterval.Day, shared: true)
                 .WriteTo.Console();
 #else

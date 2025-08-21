@@ -1,7 +1,9 @@
 ﻿@page "/setup"
 @layout SetupLayout
+@using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authorization
 @using ThreeDictionary.Application.Services
+@using ThreeDictionary.Domain.Attributes
 @using ThreeDictionary.Domain.Entities
 @inject ISnackbar Snackbar
 @inject LibraryService LibraryService
@@ -34,31 +36,24 @@
             <MudText Typo="Typo.body1">
                 Please type the root directory for your library.
             </MudText>
-            <EditForm Model="_libraryConfiguration" OnValidSubmit="@(() => Submit(_rootDirectory))">
-                <DataAnnotationsValidator/>    
-                <MudTextField Label="Password" HelperText="Choose a strong password" Class="mt-3"
-                              @bind-Value="_rootDirectory" InputType="InputType.Text"/>
-                
-                <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled"
-                           FullWidth>Submit
-                </MudButton>
-            </EditForm>
-            
-            <MudForm @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors">
-                <MudTextField T="string"
-                              Label="Root Directory"
-                              @bind-Value="_rootDirectory"
-                              Required
-                              RequiredError="Root Directory is required!"
+            <EditForm Model="_libraryConfiguration" OnSubmit="Submit">
+                <DataAnnotationsValidator/>
+                <ValidationSummary/>
+                <MudTextField Label="Root Directory" 
+                              HelperText="Example: C:/Assets " 
+                              Class="mt-3"
+                              @bind-Value="_libraryConfiguration.RootDirectory" 
+                              For="() => _libraryConfiguration.RootDirectory" 
+                              InputType="InputType.Text"
                               OnlyValidateIfDirty="false"
-                              Variant="Variant.Outlined"
-                              FullWidth
-                              Validation="@(new Func<string, IEnumerable<string>>(ValidateDirectory))"/>
-            </MudForm>
-            <MudButton OnClick="@(() => Submit(_rootDirectory))" Color="Color.Primary" Variant="Variant.Filled"
-                       FullWidth>Submit
-            </MudButton>            
+                              Immediate="true"/>
 
+                <div class="mt-2">
+                    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled" FullWidth>
+                        Submit
+                    </MudButton>
+                </div>
+            </EditForm>
         </MudStack>
     }
 </MudContainer>
@@ -66,12 +61,7 @@
 
 @code {
     private bool _loaded;
-    private string _rootDirectory = string.Empty;
     private LibraryConfiguration? _libraryConfiguration;
-
-    private MudForm _form;
-    private bool _success;
-    private string[] _errors = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -88,31 +78,12 @@
         _loaded = true;
     }
 
-    private async Task Submit(string path)
+    private async Task Submit()
     {
-        await _form.Validate();
-        if (!_success) return;
+        var path = _libraryConfiguration!.RootDirectory?.Trim() ?? string.Empty;
         await LibraryService.UpdateRootDirectory(path);
         await LibraryService.ToggleInitialised();
         Snackbar.Add("Default directory set successfully.", Severity.Success);
         NavigationManager.NavigateTo("/");
     }
-
-    private IEnumerable<string> ValidateDirectory(string path)
-    {
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            yield return "Root directory is required!";
-            yield break;
-        }
-        if (!Path.Exists(path) || !Directory.Exists(path))
-        {
-            yield return "The selected path is not a valid directory.";
-        }
-        if (Directory.Exists(path) && Directory.GetFiles(path).Length > 0)
-        {
-            yield return "The selected directory already contains assets. Please choose an empty directory.";
-        }
-    }
-
 }

@@ -1,27 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ThreeDictionary.Domain.Entities;
 
 namespace ThreeDictionary.Domain.Attributes;
 
-public class DirectoryMustExistAttribute: ValidationAttribute
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
+public class DirectoryMustExistAttribute : ValidationAttribute
 {
-    public DirectoryMustExistAttribute(string path)
+    protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
     {
-        Path = path;
-    }
+        var path = (value as string)?.Trim();
 
-    public string Path { get; }
+        if (string.IsNullOrWhiteSpace(path))
+            return new ValidationResult("Directory path cannot be null or empty.");
 
-    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-    {
-        var directoryPath = (string)validationContext.ObjectInstance;
-        
-        if (string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
-        {
-            return new ValidationResult("The specified directory does not exist.");
-        }
-        
+        if (!Directory.Exists(path))
+            return new ValidationResult("Directory does not exist.");
 
-
-        return ValidationResult.Success;
+        return Directory.EnumerateFileSystemEntries(path).Any() ? new ValidationResult("The directory must be empty.") : ValidationResult.Success;
     }
 }
