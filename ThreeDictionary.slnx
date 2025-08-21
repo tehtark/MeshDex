@@ -1,0 +1,12 @@
+﻿<Solution>
+  <Folder Name="/Libraries/">
+    <Project Path="ThreeDictionary.Application\ThreeDictionary.Application.csproj" Type="Classic C#" />
+    <Project Path="ThreeDictionary.Domain\ThreeDictionary.Domain.csproj" Type="Classic C#" />
+    <Project Path="ThreeDictionary.Infrastructure\ThreeDictionary.Infrastructure.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="directory.build.props" />
+  </Folder>
+  <Project Path="ThreeDictionary\ThreeDictionary.csproj" Type="Classic C#" />
+</Solution>

@@ -1,5 +1,3 @@
-using Serilog;
-using Serilog.AspNetCore;
 using ThreeDictionary.Application;
 using ThreeDictionary.Components;
 using ThreeDictionary.Extensions;
