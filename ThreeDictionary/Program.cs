@@ -19,7 +19,7 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         InitialiseLogger(builder);
-        
+
         await builder.Services.AddInfrastructure();
         builder.Services.AddApplication();
 
@@ -73,7 +73,7 @@ public class Program
             .AddInteractiveServerRenderMode();
 
         app.MapAdditionalIdentityEndpoints();
-        
+
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;
@@ -104,7 +104,7 @@ public class Program
         });
         Log.Debug("Logger: Initialised.");
     }
-    
+
     private static async Task CreateRolesAsync(IServiceProvider serviceProvider)
     {
         var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -149,5 +149,4 @@ public class Program
             }
         }
     }
-    
 }
