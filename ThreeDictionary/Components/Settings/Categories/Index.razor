@@ -24,6 +24,7 @@ else
     else
     {
         <MudDataGrid Items="@_categories">
+            
             <Columns>
                 <PropertyColumn Property=" x => x.Id"></PropertyColumn>
                 <PropertyColumn Property=" x => x.Name"></PropertyColumn>
@@ -33,8 +34,8 @@ else
 }
 
 @code {
-    List<LibraryCategory?> _categories = [];
-    private bool _loaded = false;
+    List<LibraryCategory> _categories = [];
+    private bool _loaded;
 
     protected override async Task OnInitializedAsync()
     {

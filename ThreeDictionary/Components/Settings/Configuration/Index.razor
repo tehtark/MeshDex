@@ -7,7 +7,7 @@
 @inject LibraryConfigurationService LibraryConfigurationService
 @attribute [Authorize]
 
-@if (!_loaded)
+@if (!_loaded || _libraryConfiguration is null)
 {
     <Loading/>
 }

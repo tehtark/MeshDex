@@ -15,7 +15,7 @@
 <MudContainer MaxWidth="MaxWidth.Medium"
               Class="d-flex flex-column justify-center align-center"
               Style="height: 100vh; text-align: center;">
-    @if (!_loaded)
+    @if (!_loaded || _libraryConfiguration is null)
     {
         <Loading/>
     }
