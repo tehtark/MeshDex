@@ -14,7 +14,7 @@ public class LibraryModelService(
     {
         // Load configuration root
         var config = await libraryConfigurationService.GetConfigurationAsync();
-        var root = config?.RootDirectory?.Trim();
+        var root = config?.RootDirectory.Trim();
         if (string.IsNullOrWhiteSpace(root))
             throw new InvalidOperationException("Library root directory is not configured. Go to Settings → Configuration to set it.");
 
@@ -45,7 +45,7 @@ public class LibraryModelService(
         return models;
     }
 
-    public async Task CreateModelAsync(string name, int categoryId, CancellationToken ct = default)
+    public async Task CreateModelAsync(string? name, int categoryId, CancellationToken ct = default)
     {
         // Validate inputs
         var trimmed = (name ?? string.Empty).Trim();
@@ -59,7 +59,7 @@ public class LibraryModelService(
 
         // Load configuration root
         var config = await libraryConfigurationService.GetConfigurationAsync();
-        var root = config?.RootDirectory?.Trim();
+        var root = config?.RootDirectory.Trim();
         if (string.IsNullOrWhiteSpace(root))
             throw new InvalidOperationException("Library root directory is not configured. Go to Settings → Configuration to set it.");
 
@@ -127,9 +127,9 @@ public class LibraryModelService(
 
             await tx.CommitAsync(ct);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            // Try to rollback FS change if directory is still empty
+            // Try to roll back FS change if the directory is still empty
             try
             {
                 if (Directory.Exists(modelPathFull) &&
@@ -138,7 +138,7 @@ public class LibraryModelService(
                     Directory.Delete(modelPathFull);
                 }
             }
-            catch { /* best effort cleanup */ }
+            catch { /* best effort clean-up */ }
             await tx.RollbackAsync(ct);
             throw;
         }

@@ -2,8 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using ThreeDictionary.Domain.Entities;
 
-namespace ThreeDictionary.Infrastructure.Identity;
 // Remove the "else if (EmailSender is IdentityNoOpEmailSender)" block from RegisterConfirmation.razor after updating with a real implementation.
+
+namespace ThreeDictionary.Infrastructure.Mail;
 
 public sealed class IdentityNoOpEmailSender : IEmailSender<User>
 {

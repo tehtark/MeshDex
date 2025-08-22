@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using ThreeDictionary.Domain.Entities;
 using ThreeDictionary.Infrastructure.Data;
-using ThreeDictionary.Infrastructure.Identity;
+using ThreeDictionary.Infrastructure.Mail;
 
 namespace ThreeDictionary.Infrastructure.Extensions;
 

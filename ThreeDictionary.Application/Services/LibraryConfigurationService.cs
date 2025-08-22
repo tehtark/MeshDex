@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Serilog;
 using ThreeDictionary.Domain.Entities;
 using ThreeDictionary.Infrastructure.Data;
 
@@ -23,7 +24,7 @@ public class LibraryConfigurationService(ApplicationDbContext dbContext)
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Log.Error(e,"{eMessage}", e.Message);
             return false;
         }
 
@@ -43,7 +44,7 @@ public class LibraryConfigurationService(ApplicationDbContext dbContext)
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            Log.Error(e,"{eMessage}", e.Message);
             return false;
         }
 

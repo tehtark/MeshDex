@@ -11,7 +11,7 @@ using ThreeDictionary.Infrastructure.Data;
 namespace ThreeDictionary.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250822002846_Initial")]
+    [Migration("20250822024810_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
