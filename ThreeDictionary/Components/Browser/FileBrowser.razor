@@ -1,5 +1,7 @@
-﻿@inject IDialogService DialogService
-
+﻿@using ThreeDictionary.Application.Services
+@using ThreeDictionary.Domain.Entities
+@inject IDialogService DialogService
+@inject LibraryModelService LibraryModelService
 <div style="padding-top: 20px;">
     <MudAppBar Dense="true" Gutters="false" Class="height-20" Elevation="2">
         <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" Class="height-20">
@@ -10,14 +12,28 @@
         </MudStack>
     </MudAppBar>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
-        @for (var i = 0; i < _count; i++)
+    @if (!_loaded)
+    {
+        <Loading/>
+    }
+    else
+    {
+        @if (_models.Count == 0)
         {
-            <MudPaper Height="140px" Width="100%" Class="d-flex justify-center align-center">
-                Model
-            </MudPaper>
+            <MudText Typo="Typo.body1">No models in the library.</MudText>
         }
-    </div>
+        else
+        {
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
+                @foreach (var model in _models)
+                {
+                    <MudPaper Height="140px" Width="100%" Class="d-flex justify-center align-center">
+                        @model.Name
+                    </MudPaper>
+                }
+            </div>
+        }
+    }
 </div>
 
 <style>
@@ -29,17 +45,34 @@
 
 
 @code {
-    private readonly int _count = 100;
+    private bool _loaded;
+    private List<LibraryModel> _models;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Load();
+    }
+
+    private async Task Load()
+    {
+        _models = await LibraryModelService.GetAllModelsAsync();
+        _loaded = true;
+    }
 
     private async Task OnNewFile()
     {
-        await DialogService.ShowAsync<AddNewModelDialog>("Add New Model", new DialogOptions
+        var dialogRef = await DialogService.ShowAsync<AddNewModelDialog>("Add New Model", new DialogOptions
         {
             CloseButton = true,
             MaxWidth = MaxWidth.ExtraSmall,
             FullWidth = true,
             BackdropClick = false
         });
+        var result = await dialogRef.Result;
+        if (!result.Canceled)
+        {
+            await Load();
+            StateHasChanged();
+        }
     }
-
 }

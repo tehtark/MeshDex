@@ -11,7 +11,7 @@ using ThreeDictionary.Infrastructure.Data;
 namespace ThreeDictionary.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250821204525_Initial")]
+    [Migration("20250822002846_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -182,6 +182,28 @@ namespace ThreeDictionary.Infrastructure.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("LibraryConfigurations");
+                });
+
+            modelBuilder.Entity("ThreeDictionary.Domain.Entities.LibraryModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LibraryModels");
                 });
 
             modelBuilder.Entity("ThreeDictionary.Domain.Entities.User", b =>

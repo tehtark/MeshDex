@@ -1,38 +1,40 @@
 ﻿@using ThreeDictionary.Application.Services
 @using ThreeDictionary.Domain.Entities
+@using MudBlazor
 @inject LibraryCategoryService LibraryCategoryService
 
-<MudPopover Open="@Open" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" AnchorEl="@AnchorEl">
-    <MudPaper Class="pa-4" Elevation="8" Style="min-width: 360px;">
-        <MudText Typo="Typo.h6" Class="mb-2">New Category</MudText>
-        <MudTextField @bind-Value="_name" Label="Name" Placeholder="e.g. Science" Immediate="true" Required="true" RequiredError="Name is required" MaxLength="100" />
+<MudDialog>
+    <TitleContent>New Category</TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="_name" Label="Name" Placeholder="e.g. Science" Immediate="true" Required="true"
+                      RequiredError="Name is required" MaxLength="100"/>
         <MudSelect T="int?" @bind-Value="_parentId" Label="Parent (optional)" Class="mt-2" Clearable="true">
-            <MudSelectItem Value="@( (int?)null )">None</MudSelectItem>
+            <MudSelectItem Value="@((int?)null)">None</MudSelectItem>
             @foreach (var c in Categories.OrderBy(c => c.Name))
             {
-                <MudSelectItem Value="@( (int?)c.Id )">@c.Name</MudSelectItem>
+                <MudSelectItem Value="@((int?)c.Id)">@c.Name</MudSelectItem>
             }
         </MudSelect>
         @if (!string.IsNullOrWhiteSpace(_error))
         {
             <MudText Color="Color.Error" Typo="Typo.caption">@_error</MudText>
         }
-        <MudStack Row Justify="Justify.FlexEnd" Class="mt-3">
-            <MudButton Variant="Variant.Text" OnClick="OnCancel">Cancel</MudButton>
-            <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Disabled="@_adding" OnClick="AddAsync">
-                @if (_adding) { <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2" /> }
-                Add
-            </MudButton>
-        </MudStack>
-    </MudPaper>
-</MudPopover>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="OnCancel">Cancel</MudButton>
+        <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Disabled="@_adding" OnClick="AddAsync">
+            @if (_adding)
+            {
+                <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2"/>
+            }
+            Add
+        </MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
-    [Parameter] public bool Open { get; set; }
-    [Parameter] public ElementReference AnchorEl { get; set; }
+    [CascadingParameter] private IMudDialogInstance? MudDialog { get; set; }
     [Parameter] public List<LibraryCategory> Categories { get; set; } = new();
-    [Parameter] public EventCallback OnClose { get; set; }
-    [Parameter] public EventCallback OnCreated { get; set; }
 
     private string _name = string.Empty;
     private int? _parentId = null;
@@ -41,11 +43,10 @@
 
     protected override void OnParametersSet()
     {
-        // Reset fields when opening
-        if (Open && !_adding)
+        // Reset fields on open
+        if (!_adding)
         {
             _error = null;
-            // Only reset if just opened with empty fields
             if (_name == string.Empty && _parentId == null)
             {
                 _name = string.Empty;
@@ -54,32 +55,35 @@
         }
     }
 
-    private async Task OnCancel()
+    private Task OnCancel()
     {
         _error = null;
-        await OnClose.InvokeAsync();
+        MudDialog?.Cancel();
+        return Task.CompletedTask;
     }
 
     private async Task AddAsync()
     {
         _error = null;
         var name = _name?.Trim() ?? string.Empty;
+        
         if (string.IsNullOrWhiteSpace(name))
         {
             _error = "Name is required";
             return;
         }
-        if (await LibraryCategoryService.CategoryExistsAsync(name))
+
+        if (Categories.Any(c => string.Equals(c.Name, name, StringComparison.Ordinal)))
         {
             _error = "A category with this name already exists.";
             return;
         }
+
         try
         {
             _adding = true;
             await LibraryCategoryService.CreateCategoryAsync(new LibraryCategory { Name = name, ParentId = _parentId });
-            await OnCreated.InvokeAsync();
-            await OnClose.InvokeAsync();
+            MudDialog?.Close(DialogResult.Ok(true));
             _name = string.Empty;
             _parentId = null;
         }
@@ -92,4 +96,5 @@
             _adding = false;
         }
     }
+
 }

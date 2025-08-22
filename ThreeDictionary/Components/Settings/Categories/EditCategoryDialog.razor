@@ -2,17 +2,18 @@
 @using ThreeDictionary.Domain.Entities
 @inject LibraryCategoryService LibraryCategoryService
 
-<MudPopover Open="@Open" AnchorOrigin="Origin.BottomCenter" TransformOrigin="Origin.TopCenter" AnchorEl="@AnchorEl">
-    <MudPaper Class="pa-4" Elevation="8" Style="min-width: 360px;">
-        <MudText Typo="Typo.h6" Class="mb-2">Edit Category</MudText>
-        <MudTextField @bind-Value="_name" Label="Name" Immediate="true" Required="true" RequiredError="Name is required" MaxLength="100" />
+<MudDialog>
+    <TitleContent>Edit Category</TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="_name" Label="Name" Immediate="true" Required="true" RequiredError="Name is required"
+                      MaxLength="100"/>
         <MudSelect T="int?" @bind-Value="_parentId" Label="Parent (optional)" Class="mt-2" Clearable="true">
-            <MudSelectItem Value="@( (int?)null )">None</MudSelectItem>
+            <MudSelectItem Value="@((int?)null)">None</MudSelectItem>
             @foreach (var c in Categories.OrderBy(c => c.Name))
             {
                 if (c.Id != _id)
                 {
-                    <MudSelectItem Value="@( (int?)c.Id )">@c.Name</MudSelectItem>
+                    <MudSelectItem Value="@((int?)c.Id)">@c.Name</MudSelectItem>
                 }
             }
         </MudSelect>
@@ -20,23 +21,23 @@
         {
             <MudText Color="Color.Error" Typo="Typo.caption">@_error</MudText>
         }
-        <MudStack Row Justify="Justify.FlexEnd" Class="mt-3">
-            <MudButton Variant="Variant.Text" OnClick="OnCancel">Cancel</MudButton>
-            <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Disabled="@_saving" OnClick="SaveAsync">
-                @if (_saving) { <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2" /> }
-                Save
-            </MudButton>
-        </MudStack>
-    </MudPaper>
-</MudPopover>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="OnCancel">Cancel</MudButton>
+        <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Disabled="@_saving" OnClick="SaveAsync">
+            @if (_saving)
+            {
+                <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2"/>
+            }
+            Save
+        </MudButton>
+    </DialogActions>
+</MudDialog>
 
 @code {
-    [Parameter] public bool Open { get; set; }
-    [Parameter] public ElementReference AnchorEl { get; set; }
+    [CascadingParameter] private IMudDialogInstance? MudDialog { get; set; }
     [Parameter] public List<LibraryCategory> Categories { get; set; } = new();
     [Parameter] public LibraryCategory? Category { get; set; }
-    [Parameter] public EventCallback OnClose { get; set; }
-    [Parameter] public EventCallback OnSaved { get; set; }
 
     private int _id;
     private string _originalName = string.Empty;
@@ -47,7 +48,7 @@
 
     protected override void OnParametersSet()
     {
-        if (Open && Category is not null)
+        if (Category is not null)
         {
             if (_id != Category.Id)
             {
@@ -60,10 +61,11 @@
         }
     }
 
-    private async Task OnCancel()
+    private Task OnCancel()
     {
         _error = null;
-        await OnClose.InvokeAsync();
+        MudDialog?.Cancel();
+        return Task.CompletedTask;
     }
 
     private async Task SaveAsync()
@@ -75,16 +77,19 @@
             _error = "Name is required";
             return;
         }
+
         if (_parentId == _id)
         {
             _error = "A category cannot be its own parent.";
             return;
         }
-        if (!string.Equals(name, _originalName, StringComparison.Ordinal) && await LibraryCategoryService.CategoryExistsAsync(name))
+
+        if (!string.Equals(name, _originalName, StringComparison.Ordinal) && Categories.Any(c => c.Id != _id && string.Equals(c.Name, name, StringComparison.Ordinal)))
         {
             _error = "A category with this name already exists.";
             return;
         }
+
         try
         {
             _saving = true;
@@ -94,8 +99,7 @@
                 Name = name,
                 ParentId = _parentId
             });
-            await OnSaved.InvokeAsync();
-            await OnClose.InvokeAsync();
+            MudDialog?.Close(DialogResult.Ok(true));
         }
         catch (Exception ex)
         {
@@ -106,4 +110,5 @@
             _saving = false;
         }
     }
+
 }

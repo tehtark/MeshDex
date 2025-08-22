@@ -8,4 +8,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<LibraryConfiguration> LibraryConfigurations { get; set; }
     public DbSet<LibraryCategory> LibraryCategories { get; set; }
+    
+    public DbSet<LibraryModel> LibraryModels { get; set; }
 }

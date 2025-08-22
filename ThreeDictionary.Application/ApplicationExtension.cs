@@ -9,6 +9,7 @@ public static class ApplicationExtension
     {
         services.AddScoped<LibraryConfigurationService>();
         services.AddScoped<LibraryCategoryService>();
+        services.AddScoped<LibraryModelService>();
         return services;
     }
 }

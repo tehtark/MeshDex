@@ -19,17 +19,10 @@ else
     <MudStack Row AlignItems="AlignItems.Center" Class="mt-2">
         <MudText Typo="Typo.h5">Categories</MudText>
         <MudSpacer />
-        <span @ref="_addAnchor">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="ToggleAddPopover">
-                Add Category
-            </MudButton>
-        </span>
-        <span @ref="_editAnchor"></span>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenAddDialogAsync">
+            Add Category
+        </MudButton>
     </MudStack>
-
-    <NewCategoryPopover Open="@_addOpen" AnchorEl="@_addAnchor" Categories="@_categories" OnClose="CloseAddPopover" OnCreated="OnCategoryCreatedAsync" />
-
-    <EditCategoryPopover Open="@_editOpen" AnchorEl="@_editAnchor" Categories="@_categories" Category="@_selectedCategory" OnClose="CloseEditPopover" OnSaved="OnCategorySavedAsync" />
 
     @if (_categories.Count == 0)
     {
@@ -37,22 +30,13 @@ else
     }
     else
     {
-        <CategoryDataGrid Items="@_categories" OnEditRequested="OpenEditPopover" OnDeleteRequested="ConfirmDeleteAsync" />
+        <CategoryDataGrid Items="@_categories" OnEditRequested="OpenEditDialogAsync" OnDeleteRequested="ConfirmDeleteAsync" />
     }
 }
 
 @code {
     private List<LibraryCategory> _categories = new();
     private bool _loaded;
-
-    // Add popover state
-    private bool _addOpen;
-    private ElementReference _addAnchor;
-
-    // Edit popover state
-    private bool _editOpen;
-    private ElementReference _editAnchor;
-    private LibraryCategory? _selectedCategory;
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,26 +50,32 @@ else
         StateHasChanged();
     }
 
-    private void ToggleAddPopover()
+    private async Task OpenAddDialogAsync()
     {
-        _addOpen = !_addOpen;
+        var parameters = new DialogParameters { ["Categories"] = _categories };
+        var options = new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
+        var dialog = DialogService.Show<NewCategoryDialog>("New Category", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadAsync();
+        }
     }
-
-    private void CloseAddPopover()
+    
+    private async Task OpenEditDialogAsync(LibraryCategory category)
     {
-        _addOpen = false;
-    }
-
-    private async Task OnCategoryCreatedAsync()
-    {
-        await LoadAsync();
-        CloseAddPopover();
-    }
-
-    private string GetParentName(int? parentId)
-    {
-        if (parentId is not int id) return "—";
-        return _categories.FirstOrDefault(c => c.Id == id)?.Name ?? "—";
+        var parameters = new DialogParameters
+        {
+            ["Categories"] = _categories,
+            ["Category"] = category
+        };
+        var options = new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
+        var dialog = DialogService.Show<EditCategoryDialog>("Edit Category", parameters, options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadAsync();
+        }
     }
 
     private async Task ConfirmDeleteAsync(LibraryCategory category)
@@ -124,22 +114,6 @@ else
         }
     }
 
-    private void OpenEditPopover(LibraryCategory category)
-    {
-        _selectedCategory = category;
-        _editOpen = true;
-    }
 
-    private void CloseEditPopover()
-    {
-        _editOpen = false;
-        _selectedCategory = null;
-    }
-
-    private async Task OnCategorySavedAsync()
-    {
-        await LoadAsync();
-        CloseEditPopover();
-    }
 }
 

@@ -79,6 +79,21 @@ namespace ThreeDictionary.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LibraryModels",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Path = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LibraryModels", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -245,6 +260,9 @@ namespace ThreeDictionary.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "LibraryConfigurations");
+
+            migrationBuilder.DropTable(
+                name: "LibraryModels");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

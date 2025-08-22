@@ -181,6 +181,28 @@ namespace ThreeDictionary.Infrastructure.Data.Migrations
                     b.ToTable("LibraryConfigurations");
                 });
 
+            modelBuilder.Entity("ThreeDictionary.Domain.Entities.LibraryModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Path")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LibraryModels");
+                });
+
             modelBuilder.Entity("ThreeDictionary.Domain.Entities.User", b =>
                 {
                     b.Property<string>("Id")
