@@ -12,13 +12,13 @@
         </MudStack>
     </MudAppBar>
 
-    @if (!_loaded)
+    @if (!_loaded || _models == null)
     {
         <Loading/>
     }
     else
     {
-        @if (_models.Count == 0)
+        @if (_models is { Count: 0 })
         {
             <MudText Typo="Typo.body1">No models in the library.</MudText>
         }
@@ -35,7 +35,6 @@
         }
     }
 </div>
-
 <style>
     .height-20 {
         height: 20px;
@@ -46,7 +45,7 @@
 
 @code {
     private bool _loaded;
-    private List<LibraryModel> _models;
+    private List<LibraryModel>? _models;
 
     protected override async Task OnInitializedAsync()
     {
@@ -69,10 +68,11 @@
             BackdropClick = false
         });
         var result = await dialogRef.Result;
-        if (!result.Canceled)
+        if (result is { Canceled: false })
         {
             await Load();
             StateHasChanged();
         }
     }
+
 }

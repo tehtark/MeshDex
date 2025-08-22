@@ -17,7 +17,7 @@ public class LibraryModelService(
         var root = config?.RootDirectory?.Trim();
         if (string.IsNullOrWhiteSpace(root))
             throw new InvalidOperationException("Library root directory is not configured. Go to Settings → Configuration to set it.");
-        
+
         var directories = Directory.EnumerateDirectories(root);
         var models = new List<LibraryModel>();
 
@@ -25,27 +25,26 @@ public class LibraryModelService(
         {
             // Check if metadata.json exists in the directory
             var metadataPath = Path.Combine(directory, "metadata.json");
-            if (File.Exists(metadataPath))
+            if (!File.Exists(metadataPath)) continue;
+            try
             {
-                try
+                // Read and deserialize the metadata file
+                var json = await File.ReadAllTextAsync(metadataPath);
+                var model = JsonSerializer.Deserialize<LibraryModel>(json);
+                if (model != null)
                 {
-                    // Read and deserialize the metadata file
-                    var json = await File.ReadAllTextAsync(metadataPath);
-                    var model = JsonSerializer.Deserialize<LibraryModel>(json);
-                    if (model != null)
-                    {
-                         models.Add(model);
-                    }
+                    models.Add(model);
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to read model from {metadataPath}: {ex.Message}");
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to read model from {metadataPath}: {ex.Message}");
             }
         }
 
         return models;
     }
+
     public async Task CreateModelAsync(string name, int categoryId, CancellationToken ct = default)
     {
         // Validate inputs
@@ -53,7 +52,7 @@ public class LibraryModelService(
         if (string.IsNullOrWhiteSpace(trimmed))
             throw new InvalidOperationException("Model name is required.");
 
-        // Ensure category exists
+        // Ensure a category exists
         var category = await libraryCategoryService.GetCategoryAsync(categoryId);
         if (category is null)
             throw new InvalidOperationException("Selected category was not found.");
@@ -64,45 +63,84 @@ public class LibraryModelService(
         if (string.IsNullOrWhiteSpace(root))
             throw new InvalidOperationException("Library root directory is not configured. Go to Settings → Configuration to set it.");
 
+        root = Path.GetFullPath(root);
+
         // Compute model folder safe path
         var modelFolderName = FileSystemNameHelper.MakeSafeFolderName(trimmed, fallback: "Model");
         var modelPath = Path.Combine(root, modelFolderName);
+        var modelPathFull = Path.GetFullPath(modelPath);
 
-        // Check duplicates within category
+        // Check duplicates within a category
         if (Directory.Exists(modelPath))
             throw new InvalidOperationException($"A model named '{trimmed}' already exists in this category.");
 
-        LibraryModel model = new()
-        {
-            Name = name,
-            CategoryId = categoryId,
-            Path = modelPath
-        };
+        var rel = Path.GetRelativePath(root, modelPathFull);
+        if (rel.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal) || Path.IsPathRooted(rel))
+            throw new InvalidOperationException("Resolved path escapes the library root.");
 
-        // Try create directory
         try
         {
-            Directory.CreateDirectory(modelPath);
+            Directory.CreateDirectory(modelPathFull);
         }
         catch (Exception ex)
         {
             throw new InvalidOperationException($"Failed to create model folder at '{modelPath}': {ex.Message}", ex);
         }
 
-        //Create a metadata json file for the model.
-        var jsonPath = Path.Combine(modelPath, "metadata.json");
-        string json = JsonSerializer.Serialize(model, new JsonSerializerOptions() { WriteIndented = true });
+        await using var tx = await dbContext.Database.BeginTransactionAsync(ct);
+        var model = new LibraryModel()
+        {
+            Name = trimmed,
+            CategoryId = categoryId,
+            Path = rel.Replace(Path.DirectorySeparatorChar, '/'),
+        };
 
         try
         {
-            await File.WriteAllTextAsync(jsonPath, json, ct);
+            await dbContext.LibraryModels.AddAsync(model, ct);
+            await dbContext.SaveChangesAsync(ct);
+
+            var meta = new
+            {
+                SchemaVersion = 1,
+                model.Id,
+                model.Name,
+                model.CategoryId,
+                model.Path,
+                CreatedUtc = DateTime.UtcNow
+            };
+
+            var json = JsonSerializer.Serialize(meta, new JsonSerializerOptions() { WriteIndented = true });
+            var jsonPath = Path.Combine(modelPath, "metadata.json");
+            var tmpPath = jsonPath + ".tmp";
+
+            await File.WriteAllTextAsync(tmpPath, json, ct);
+
+            if (File.Exists(jsonPath))
+            {
+                File.Replace(tmpPath, jsonPath, null);
+            }
+            else
+            {
+                File.Move(tmpPath, jsonPath);
+            }
+
+            await tx.CommitAsync(ct);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            throw new InvalidOperationException($"Failed to create metadata file at '{jsonPath}': {ex.Message}", ex);
+            // Try to rollback FS change if directory is still empty
+            try
+            {
+                if (Directory.Exists(modelPathFull) &&
+                    !Directory.EnumerateFileSystemEntries(modelPathFull).Any())
+                {
+                    Directory.Delete(modelPathFull);
+                }
+            }
+            catch { /* best effort cleanup */ }
+            await tx.RollbackAsync(ct);
+            throw;
         }
-        
-        await dbContext.LibraryModels.AddAsync(model, ct);
-        await dbContext.SaveChangesAsync(ct);
     }
 }
