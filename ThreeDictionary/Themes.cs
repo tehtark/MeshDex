@@ -8,68 +8,6 @@ public static class Themes
     {
         PaletteLight = new PaletteLight
         {
-            Black = "#110e2d",
-            AppbarText = "#424242",
-            AppbarBackground = "rgba(255,255,255,0.8)",
-            DrawerBackground = "#ffffff",
-            GrayLight = "#e8e8e8",
-            GrayLighter = "#f9f9f9"
-        },
-        PaletteDark = new PaletteDark
-        {
-            Black = "rgba(39,39,47,1)",
-            Primary = "#a68a64ff",
-            Secondary = "#936639ff",
-            Tertiary = "#7f4f24ff",
-            Info = "rgba(50,153,255,1)",
-            Success = "rgba(11,186,131,1)",
-            Warning = "rgba(255,168,0,1)",
-            Error = "rgba(246,78,98,1)",
-            Dark = "#27272fff",
-            TextPrimary = "rgba(255,255,255,0.6980392156862745)",
-            TextSecondary = "rgba(255,255,255,0.4980392156862745)",
-            TextDisabled = "rgba(255,255,255,0.2)",
-            ActionDefault = "rgba(173,173,177,1)",
-            ActionDisabled = "rgba(255,255,255,0.25882352941176473)",
-            ActionDisabledBackground = "rgba(255,255,255,0.11764705882352941)",
-            Background = "#333d29ff",
-            BackgroundGray = "rgba(39,39,47,1)",
-            Surface = "#414833ff",
-            DrawerBackground = "#333d29ff",
-            DrawerText = "rgba(255,255,255,0.4980392156862745)",
-            DrawerIcon = "rgba(255,255,255,0.4980392156862745)",
-            AppbarBackground = "#333d29ff",
-            AppbarText = "rgba(255,255,255,0.6980392156862745)",
-            LinesDefault = "rgba(255,255,255,0.11764705882352941)",
-            LinesInputs = "rgba(255,255,255,0.2980392156862745)",
-            TableLines = "rgba(255,255,255,0.11764705882352941)",
-            TableStriped = "rgba(255,255,255,0.2)",
-            Divider = "rgba(255,255,255,0.11764705882352941)",
-            DividerLight = "rgba(255,255,255,0.058823529411764705)",
-            PrimaryDarken = "#936639ff",
-            PrimaryLighten = "#b6ad90ff",
-            SecondaryDarken = "#7f4f24ff",
-            SecondaryLighten = "#a68a64ff",
-            TertiaryDarken = "#582f0eff",
-            TertiaryLighten = "#936639ff",
-            InfoDarken = "rgb(10,133,255)",
-            InfoLighten = "rgb(92,173,255)",
-            SuccessDarken = "rgb(9,154,108)",
-            SuccessLighten = "rgb(13,222,156)",
-            WarningDarken = "rgb(214,143,0)",
-            WarningLighten = "rgb(255,182,36)",
-            ErrorDarken = "rgb(244,47,70)",
-            ErrorLighten = "rgb(248,119,134)",
-            DarkDarken = "rgb(23,23,28)",
-            DarkLighten = "rgb(56,56,67)"
-        },
-        LayoutProperties = new LayoutProperties()
-    };
-
-    public static readonly MudTheme Spacelab = new()
-    {
-        PaletteLight = new PaletteLight
-        {
             Black = "#000",
             White = "#fff",
             Primary = "#446e9b",
