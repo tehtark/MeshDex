@@ -1,9 +1,6 @@
 ﻿@page "/settings/categories"
-@using Microsoft.AspNetCore.Authorization
 @using ThreeDictionary.Application.Services
-@using ThreeDictionary.Components.Settings.Shared
 @using ThreeDictionary.Domain.Entities
-@layout SettingsLayout
 @attribute [Authorize(Roles = "Admin")]
 @inject LibraryCategoryService LibraryCategoryService
 @inject IDialogService DialogService
@@ -17,7 +14,6 @@
 else
 {
     <MudStack Row AlignItems="AlignItems.Center" Class="mt-2">
-        <MudText Typo="Typo.h5">Categories</MudText>
         <MudSpacer />
         <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenAddDialogAsync">
             Add Category

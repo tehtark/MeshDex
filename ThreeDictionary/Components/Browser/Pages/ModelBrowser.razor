@@ -3,7 +3,7 @@
 @inject IDialogService DialogService
 @inject LibraryModelService LibraryModelService
 <div style="padding-top: 20px;">
-    <MudAppBar Dense="true" Gutters="false" Class="height-20" Elevation="2">
+    <MudAppBar Dense="true" Gutters="false" Class="height-20" Elevation="0">
         <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" Class="height-20">
             <MudMenu Variant="Variant.Text" RelativeWidth="DropdownWidth.Adaptive" Class="height-20"
                      Style="width:min-content" Dense="true" Label="File">
@@ -12,28 +12,32 @@
         </MudStack>
     </MudAppBar>
 
-    @if (!_loaded || _models == null)
-    {
-        <Loading/>
-    }
-    else
-    {
-        @if (_models is { Count: 0 })
+    <div class="pa-3">
+
+
+        @if (!_loaded || _models == null)
         {
-            <MudText Typo="Typo.body1">No models in the library.</MudText>
+            <Loading/>
         }
         else
         {
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
-                @foreach (var model in _models)
-                {
-                    <MudPaper Height="140px" Width="100%" Class="d-flex justify-center align-center">
-                        @model.Name
-                    </MudPaper>
-                }
-            </div>
+            @if (_models is { Count: 0 })
+            {
+                <MudText Typo="Typo.body1">No models in the library.</MudText>
+            }
+            else
+            {
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px;">
+                    @foreach (var model in _models)
+                    {
+                        <MudPaper Height="140px" Width="100%" Class="d-flex justify-center align-center">
+                            @model.Name
+                        </MudPaper>
+                    }
+                </div>
+            }
         }
-    }
+    </div>
 </div>
 <style>
     .height-20 {

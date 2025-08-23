@@ -4,13 +4,11 @@
 <MudPopoverProvider/>
 <MudDialogProvider/>
 <MudSnackbarProvider/>
-<MudLayout Class="h-100" Style="min-height:100vh">
-    <MudDrawer Width="56px" Fixed="true" Open Elevation="0"> 
-        <MudImage Class="pa-1" Src="files/images/logos/logo.png"/>
-        <NavMenu/>
-    </MudDrawer>
+<MudLayout>
     <MudMainContent Class="pa-0">
-        @Body
+        <MudContainer Class="d-flex flex-column justify-center align-center" Style="height: 100vh;text-align: center; " MaxWidth="MaxWidth.Medium" Gutters="false">
+            @Body
+        </MudContainer>
     </MudMainContent>
 </MudLayout>
 

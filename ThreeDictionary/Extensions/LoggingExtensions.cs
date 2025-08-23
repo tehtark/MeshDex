@@ -13,7 +13,7 @@ public static class LoggingExtensions
             logger.MinimumLevel.Is(LogEventLevel.Debug)
                 .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning) // Filter specific namespace
                 .MinimumLevel.Override("MudBlazor", LogEventLevel.Warning) // Filter specific namespace
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning) // Filter specific namespace
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Debug) // Filter specific namespace
                 .WriteTo.File(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", "log.json"), rollingInterval: RollingInterval.Day, shared: true)
                 .WriteTo.Console();
 #else
@@ -37,7 +37,7 @@ public static class LoggingExtensions
             options.GetLevel = (httpContext, elapsed, ex) =>
             {
                 var path = httpContext.Request.Path;
-                if (ex != null || httpContext.Response.StatusCode >= 500) return Serilog.Events.LogEventLevel.Error;
+                if (ex != null || httpContext.Response.StatusCode >= 500) return LogEventLevel.Error;
                 if (path.StartsWithSegments("/_framework")
                     || path.StartsWithSegments("/_blazor")
                     || path.StartsWithSegments("/css")
@@ -46,9 +46,9 @@ public static class LoggingExtensions
                     || path.StartsWithSegments("/favicon.ico")
                     || path.StartsWithSegments("/files"))
                 {
-                    return Serilog.Events.LogEventLevel.Verbose; // suppressed in Debug (min=Debug) and Release (min=Information)
+                    return LogEventLevel.Verbose; // suppressed in Debug (min=Debug) and Release (min=Information)
                 }
-                return elapsed > 1000 ? Serilog.Events.LogEventLevel.Warning : Serilog.Events.LogEventLevel.Debug;
+                return elapsed > 1000 ? LogEventLevel.Warning : LogEventLevel.Debug;
             };
             options.EnrichDiagnosticContext = (diag, httpContext) =>
             {

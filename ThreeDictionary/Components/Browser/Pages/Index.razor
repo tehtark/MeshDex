@@ -1,0 +1,21 @@
+﻿@page "/browser"
+
+@if (!_loaded)
+{
+    <Loading/>
+}
+else
+{
+    <ModelBrowser/>
+}
+
+@code{
+
+    private bool _loaded;
+    protected override Task OnInitializedAsync()
+    {
+        _loaded = true;
+        return Task.CompletedTask;
+    }
+
+}

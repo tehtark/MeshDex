@@ -1,36 +1,38 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Authorization
 @using ThreeDictionary.Application.Services
-@using ThreeDictionary.Components.Browser
 @inject NavigationManager NavigationManager
 @inject LibraryConfigurationService LibraryConfigurationService
 @attribute [Authorize]
 
 <PageTitle>3Dictionary</PageTitle>
 
-@if (!_loaded)
-{
-    <Loading/>
-}
-else
-{
-    <FileBrowser/>
-}
+@* @if (!_loaded) *@
+@* { *@
+@*     <Loading/> *@
+@* } *@
+@* else *@
+@* { *@
+@*     <ModelBrowser/>  *@
+@* } *@
 
 @code{
 
-    private bool _loaded;
+    // private bool _loaded;
 
     protected override async Task OnInitializedAsync()
     {
         var libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync();
 
-        if (libraryConfiguration is { Initialised: false })
+        switch (libraryConfiguration)
         {
-            NavigationManager.NavigateTo("/setup");
+            case { Initialised: false }:
+                NavigationManager.NavigateTo("/setup");
+                return;
+            case { Initialised: true }:
+                NavigationManager.NavigateTo("/browser");
+                return;
         }
-
-        _loaded = true;
     }
 
 }

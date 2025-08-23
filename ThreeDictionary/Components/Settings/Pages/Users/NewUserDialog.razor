@@ -1,0 +1,103 @@
+﻿@inject UserManager<User> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using ThreeDictionary.Domain.Entities
+@inherits ComponentBase
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" Model="this" Validation="Validate">
+            <MudTextField @bind-Value="_userName" Label="User Name" Required="true" For="() => _userName" />
+            <MudTextField @bind-Value="_email" Label="Email" Required="true" For="() => _email" />
+            <MudTextField @bind-Value="_password" Label="Password" InputType="InputType.Password" Required="true" For="() => _password" />
+            <MudTextField @bind-Value="_confirmPassword" Label="Confirm Password" InputType="InputType.Password" Required="true" For="() => _confirmPassword" />
+            <MudSelect T="string" MultiSelection="true" @bind-SelectedValues="_selectedRoles" Label="Roles (optional)" Class="mt-2">
+                @foreach (var role in _allRoles)
+                {
+                    <MudSelectItem Value="@role">@role</MudSelectItem>
+                }
+            </MudSelect>
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <MudAlert Severity="Severity.Error" Class="mt-2">@_error</MudAlert>
+            }
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateAsync">Create</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance? MudDialog { get; set; }
+
+    private MudForm? _form;
+    private string _userName = string.Empty;
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+    private string _confirmPassword = string.Empty;
+    private IEnumerable<string> _selectedRoles = new HashSet<string>();
+    private List<string> _allRoles = new();
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load available roles
+        _allRoles = await RoleManager.Roles.Select(r => r.Name!).ToListAsync();
+    }
+
+    private IEnumerable<string> Validate()
+    {
+        var errors = new List<string>();
+        if (string.IsNullOrWhiteSpace(_userName)) errors.Add("User name is required");
+        if (string.IsNullOrWhiteSpace(_email)) errors.Add("Email is required");
+        if (string.IsNullOrWhiteSpace(_password)) errors.Add("Password is required");
+        if (_password != _confirmPassword) errors.Add("Passwords do not match");
+        return errors;
+    }
+
+    private void Cancel()
+    {
+        MudDialog?.Cancel();
+    }
+
+    private async Task CreateAsync()
+    {
+        _error = null;
+        await _form!.Validate();
+        if (!_form.IsValid)
+            return;
+
+        var user = new User
+        {
+            UserName = _userName,
+            Email = _email,
+            EmailConfirmed = false
+        };
+        var result = await UserManager.CreateAsync(user, _password);
+        if (!result.Succeeded)
+        {
+            _error = string.Join("\n", result.Errors.Select(e => e.Description));
+            StateHasChanged();
+            return;
+        }
+
+        // Assign selected roles; create missing roles as needed
+        var selectedSet = new HashSet<string>(_selectedRoles, StringComparer.OrdinalIgnoreCase);
+        foreach (var role in selectedSet)
+        {
+            if (!await RoleManager.RoleExistsAsync(role))
+            {
+                await RoleManager.CreateAsync(new IdentityRole(role));
+            }
+        }
+        if (selectedSet.Count > 0)
+        {
+            await UserManager.AddToRolesAsync(user, selectedSet);
+        }
+
+        MudDialog?.Close(DialogResult.Ok(true));
+    }
+}

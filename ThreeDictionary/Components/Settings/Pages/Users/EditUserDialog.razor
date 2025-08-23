@@ -1,0 +1,295 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@using ThreeDictionary.Domain.Entities
+@inject UserManager<User> UserManager
+@inject RoleManager<IdentityRole> RoleManager
+@inject IDialogService DialogService
+
+<MudDialog>
+    <TitleContent>Edit User</TitleContent>
+    <DialogContent>
+        @if (_loading)
+        {
+            <Loading />
+        }
+        else if (_error is not null)
+        {
+            <MudAlert Severity="Severity.Error">@_error</MudAlert>
+        }
+        else if (_user is not null)
+        {
+            <MudForm @ref="_form" Model="this" Validation="Validate">
+                <MudTextField @bind-Value="_userName" Label="User Name" Required="true" For="() => _userName" />
+                <MudTextField @bind-Value="_email" Label="Email" Required="true" For="() => _email" />
+                <!-- Status + actions row (replaces the switch) -->
+                <MudStack Row AlignItems="AlignItems.Center" Class="mt-2">
+                    <MudChip T="string" Color="@(_emailConfirmed ? Color.Success : Color.Warning)" Variant="Variant.Filled" Size="Size.Small">
+                        @(_emailConfirmed ? "Email is verified" : "Email not verified")
+                    </MudChip>
+
+                    <MudSpacer />
+
+                    @if (!_emailConfirmed)
+                    {
+                        <MudButton Color="Color.Success"
+                                   Variant="Variant.Filled"
+                                   Disabled="@(_verifying || _saving || _loading)"
+                                   OnClick="VerifyEmailAsync">
+                            @if (_verifying)
+                            {
+                                <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2" />
+                            }
+                            Verify Email
+                        </MudButton>
+                    }
+                    else
+                    {
+                        <MudButton Color="Color.Default"
+                                   Variant="Variant.Outlined"
+                                   Disabled="@(_unconfirming || _saving || _loading)"
+                                   OnClick="UnconfirmEmailAsync">
+                            @if (_unconfirming)
+                            {
+                                <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2" />
+                            }
+                            Unconfirm
+                        </MudButton>
+                    }
+                </MudStack>
+                <MudSelect T="string" MultiSelection="true" @bind-SelectedValues="_selectedRoles" Label="Roles" Class="mt-2">
+                    @foreach (var role in _allRoles)
+                    {
+                        <MudSelectItem Value="@role">@role</MudSelectItem>
+                    }
+                </MudSelect>
+                @if (!string.IsNullOrEmpty(_validationError))
+                {
+                    <MudText Color="Color.Error" Typo="Typo.caption">@_validationError</MudText>
+                }
+            </MudForm>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="OnCancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Secondary" Disabled="@(_saving || _loading)" OnClick="OpenResetPasswordDialogAsync">
+            Reset Password
+        </MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(_saving || _loading)" OnClick="SaveAsync">
+            @if (_saving)
+            {
+                <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2" />
+            }
+            Save
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance? MudDialog { get; set; }
+    [Parameter] public User User { get; set; } = default!;
+
+    private MudForm? _form;
+    private User? _user;
+    private bool _loading = true;
+    private bool _saving;
+    private string? _error;
+
+    private string _userName = string.Empty;
+    private string _email = string.Empty;
+    private bool _emailConfirmed;
+    private bool _originalEmailConfirmed;
+    private bool _verifying;
+    private bool _unconfirming;
+
+    private IEnumerable<string> _selectedRoles = new HashSet<string>();
+    private List<string> _allRoles = new();
+
+    private string? _validationError;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _error = null;
+        try
+        {
+            _user = await UserManager.FindByIdAsync(User.Id);
+            if (_user is null)
+            {
+                _error = "User not found";
+                return;
+            }
+
+            _userName = _user.UserName ?? string.Empty;
+            _email = _user.Email ?? string.Empty;
+            _emailConfirmed = _user.EmailConfirmed;
+            _originalEmailConfirmed = _user.EmailConfirmed;
+
+            _allRoles = await RoleManager.Roles.Select(r => r.Name!).ToListAsync();
+            var currentRoles = await UserManager.GetRolesAsync(_user);
+            _selectedRoles = currentRoles.ToList();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private IEnumerable<string> Validate()
+    {
+        var errors = new List<string>();
+        if (string.IsNullOrWhiteSpace(_userName)) errors.Add("User name is required");
+        if (string.IsNullOrWhiteSpace(_email)) errors.Add("Email is required");
+        return errors;
+    }
+
+    private void OnCancel()
+    {
+        MudDialog?.Cancel();
+    }
+
+    private async Task VerifyEmailAsync()
+    {
+        _validationError = null;
+        if (_user is null) return;
+
+        _verifying = true;
+        try
+        {
+            var token = await UserManager.GenerateEmailConfirmationTokenAsync(_user);
+            var confirmResult = await UserManager.ConfirmEmailAsync(_user, token);
+            if (!confirmResult.Succeeded)
+            {
+                _validationError = string.Join("\n", confirmResult.Errors.Select(e => e.Description));
+                return;
+            }
+
+            _emailConfirmed = true;
+            _originalEmailConfirmed = true;
+        }
+        catch (Exception ex)
+        {
+            _validationError = ex.Message;
+        }
+        finally
+        {
+            _verifying = false;
+        }
+    }
+
+    private async Task UnconfirmEmailAsync()
+    {
+        _validationError = null;
+        if (_user is null) return;
+
+        _unconfirming = true;
+        try
+        {
+            _user.EmailConfirmed = false;
+            var updateResult = await UserManager.UpdateAsync(_user);
+            if (!updateResult.Succeeded)
+            {
+                _validationError = string.Join("\n", updateResult.Errors.Select(e => e.Description));
+                return;
+            }
+
+            _emailConfirmed = false;
+            _originalEmailConfirmed = false;
+        }
+        catch (Exception ex)
+        {
+            _validationError = ex.Message;
+        }
+        finally
+        {
+            _unconfirming = false;
+        }
+    }
+
+    private async Task OpenResetPasswordDialogAsync()
+    {
+        _validationError = null;
+        if (_user is null) return;
+        try
+        {
+            var parameters = new MudBlazor.DialogParameters
+            {
+                ["User"] = _user
+            };
+            var options = new MudBlazor.DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MudBlazor.MaxWidth.Small, Position = MudBlazor.DialogPosition.Center };
+            var dialog = DialogService.Show<ResetPasswordDialog>("Reset Password", parameters, options);
+            var result = await dialog.Result;
+            // Optionally, handle success or error here; dialog already shows errors
+        }
+        catch (Exception ex)
+        {
+            _validationError = ex.Message;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        _validationError = null;
+        await _form!.Validate();
+        if (!_form.IsValid) return;
+        if (_user is null) return;
+
+        _saving = true;
+        try
+        {
+            // Update basic fields using UserManager to ensure normalised fields and validation
+            IdentityResult result;
+
+            if (!string.Equals(_user.UserName, _userName, StringComparison.Ordinal))
+            {
+                result = await UserManager.SetUserNameAsync(_user, _userName);
+                if (!result.Succeeded)
+                {
+                    _validationError = string.Join("\n", result.Errors.Select(e => e.Description));
+                    return;
+                }
+            }
+
+            if (!string.Equals(_user.Email, _email, StringComparison.OrdinalIgnoreCase))
+            {
+                result = await UserManager.SetEmailAsync(_user, _email);
+                if (!result.Succeeded)
+                {
+                    _validationError = string.Join("\n", result.Errors.Select(e => e.Description));
+                    return;
+                }
+            }
+            
+            // Sync roles
+            var currentRoles = await UserManager.GetRolesAsync(_user);
+            var selectedSet = new HashSet<string>(_selectedRoles, StringComparer.OrdinalIgnoreCase);
+            var toRemove = currentRoles.Except(selectedSet, StringComparer.OrdinalIgnoreCase).ToList();
+            var toAdd = selectedSet.Except(currentRoles, StringComparer.OrdinalIgnoreCase).ToList();
+
+            foreach (var role in toAdd)
+            {
+                if (!await RoleManager.RoleExistsAsync(role))
+                {
+                    await RoleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
+            if (toRemove.Count > 0)
+                await UserManager.RemoveFromRolesAsync(_user, toRemove);
+            if (toAdd.Count > 0)
+                await UserManager.AddToRolesAsync(_user, toAdd);
+
+            MudDialog?.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            _validationError = ex.Message;
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+}

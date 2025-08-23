@@ -1,11 +1,7 @@
 ﻿@page "/settings/configuration"
-@using Microsoft.AspNetCore.Authorization
 @using ThreeDictionary.Application.Services
-@using ThreeDictionary.Components.Settings.Shared
 @using ThreeDictionary.Domain.Entities
-@layout SettingsLayout
 @inject LibraryConfigurationService LibraryConfigurationService
-@attribute [Authorize]
 
 @if (!_loaded || _libraryConfiguration is null)
 {
@@ -15,7 +11,6 @@ else
 {
     // form to show where the library "Assets" folder is located.
     <MudStack Justify="Justify.Center" AlignItems="AlignItems.Center" Class="h-100">
-        <MudText Typo="Typo.h5">Settings</MudText>
         <MudTextField @bind-Value="_libraryConfiguration.RootDirectory" Label="Default Dictionary Path"
                       Variant="Variant.Outlined"
                       FullWidth Required/>

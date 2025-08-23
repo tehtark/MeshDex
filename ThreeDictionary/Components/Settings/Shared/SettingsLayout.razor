@@ -1,30 +1,16 @@
 ﻿@inherits LayoutComponentBase
+@layout MainLayout
 
-<MudThemeProvider Theme="Themes.Default" ISDarkMode="true"/>
-<MudPopoverProvider/>
-<MudDialogProvider/>
-<MudSnackbarProvider/>
-<MudLayout>
-    <MudDrawer Fixed="true" Width="56px" id="nav-drawer" Open="true" Elevation="2">
-        <MudImage Class="pa-1" Src="files/images/logos/logo.png"/>
-        <NavMenu/>
-    </MudDrawer>
-    <MudMainContent Class="pa-4">
-        <MudGrid>
-            <MudItem xs="2">
-                <MudText Typo="Typo.h6" GutterBottom="true">Change your account settings</MudText>
-                <SettingsNavMenu/>
-            </MudItem>
-            <MudItem xs="10">
-                @Body
-            </MudItem>
-        </MudGrid>
-    </MudMainContent>
-</MudLayout>
-
-
-<div id="blazor-error-ui" data-nosnippet>
-    An unhandled error has occurred.
-    <a href="." class="reload">Reload</a>
-    <span class="dismiss">🗙</span>
-</div>
+<MudGrid Spacing="0">
+    <MudItem xs="3" sm="3" md="3" lg="2" xl="2" Class="h-100">
+        <MudPaper Elevation="0" Class="h-100 d-flex flex-column" Style="min-height:100vh">
+            <MudText Class="pa-1" Typo="Typo.h6" Align="Align.Center">Settings</MudText>
+            <SettingsNavMenu/>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="9" sm="9" md="9" lg="10" xl="10" Class="h-100 d-flex flex-column">
+        <div class="pa-4 flex-grow-1 d-flex flex-column">
+            @Body
+        </div>
+    </MudItem>
+</MudGrid>

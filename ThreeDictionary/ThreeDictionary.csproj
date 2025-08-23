@@ -30,4 +30,25 @@
         <ProjectReference Include="..\ThreeDictionary.Infrastructure\ThreeDictionary.Infrastructure.csproj"/>
     </ItemGroup>
 
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Settings\Pages\Categories\CategoryDataGrid.razor" />
+      <AdditionalFiles Include="Components\Settings\Pages\Categories\EditCategoryDialog.razor" />
+      <AdditionalFiles Include="Components\Settings\Pages\Categories\Index.razor" />
+      <AdditionalFiles Include="Components\Settings\Pages\Categories\NewCategoryDialog.razor" />
+      <AdditionalFiles Include="Components\Settings\Pages\Categories\_Imports.razor" />
+      <AdditionalFiles Include="Components\Settings\Pages\Configuration\Index.razor" />
+      <AdditionalFiles Include="Components\Shared\Components\Utilities\Loading.razor" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Settings\Configuration\Index.razor" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+      <Folder Include="Components\Shared\Components\" />
+    </ItemGroup>
+
 </Project>
