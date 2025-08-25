@@ -6,8 +6,9 @@
     </TitleContent>
     <DialogContent>
         <MudTextField @bind-Value="_name" Label="Name" Placeholder="e.g. My 3D Model" Immediate="true" Required="true"
-                      RequiredError="Name is required" MaxLength="120" />
-        <MudSelect T="int?" @bind-Value="_categoryId" Label="Category" Class="mt-2" Required="true" RequiredError="Category is required">
+                      RequiredError="Name is required" MaxLength="120"/>
+        <MudSelect T="int?" @bind-Value="_categoryId" Label="Category" Class="mt-2" Required="true"
+                   RequiredError="Category is required">
             @if (_loading)
             {
                 <MudSelectItem Value="@((int?)null)">Loading...</MudSelectItem>
@@ -30,7 +31,7 @@
         <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Disabled="@_adding" OnClick="AddAsync">
             @if (_adding)
             {
-                <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2" />
+                <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2"/>
             }
             Add
         </MudButton>
@@ -78,6 +79,7 @@
             _error = "Name is required";
             return;
         }
+
         if (_categoryId is null)
         {
             _error = "Category is required";
@@ -99,4 +101,5 @@
             _adding = false;
         }
     }
+
 }

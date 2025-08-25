@@ -4,6 +4,7 @@
 @inject UserManager<User> UserManager
 @inject RoleManager<IdentityRole> RoleManager
 @inject IDialogService DialogService
+@inject ISnackbar Snackbar
 
 <MudDialog>
     <TitleContent>Edit User</TitleContent>
@@ -169,6 +170,7 @@
 
             _emailConfirmed = true;
             _originalEmailConfirmed = true;
+            Snackbar.Add("Email verified successfully.", Severity.Success);
         }
         catch (Exception ex)
         {
@@ -198,6 +200,7 @@
 
             _emailConfirmed = false;
             _originalEmailConfirmed = false;
+            Snackbar.Add("Email unconfirmed successfully.", Severity.Success);
         }
         catch (Exception ex)
         {
@@ -281,6 +284,7 @@
             if (toAdd.Count > 0)
                 await UserManager.AddToRolesAsync(_user, toAdd);
 
+            Snackbar.Add($"User '{_userName}' updated successfully.", Severity.Success);
             MudDialog?.Close(DialogResult.Ok(true));
         }
         catch (Exception ex)

@@ -9,6 +9,7 @@
 @inject RoleManager<IdentityRole> RoleManager
 @inject IDialogService DialogService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ISnackbar Snackbar
 
 <PageTitle>Users</PageTitle>
 
@@ -154,6 +155,7 @@ else
                 return;
             }
 
+            Snackbar.Add($"User '{fresh.UserName}' deleted successfully.", Severity.Success);
             await LoadAsync();
         }
         catch (Exception ex)

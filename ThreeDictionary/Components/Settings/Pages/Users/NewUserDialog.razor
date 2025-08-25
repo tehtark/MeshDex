@@ -1,5 +1,6 @@
 ﻿@inject UserManager<User> UserManager
 @inject RoleManager<IdentityRole> RoleManager
+@inject ISnackbar Snackbar
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using ThreeDictionary.Domain.Entities
@@ -98,6 +99,7 @@
             await UserManager.AddToRolesAsync(user, selectedSet);
         }
 
+        Snackbar.Add($"User '{_userName}' created successfully.", Severity.Success);
         MudDialog?.Close(DialogResult.Ok(true));
     }
 }

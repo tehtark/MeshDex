@@ -1,0 +1,158 @@
+﻿@page "/settings/roles"
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@attribute [Authorize(Roles = "Admin")]
+@inject RoleManager<IdentityRole> RoleManager
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<PageTitle>Roles</PageTitle>
+
+@if (!_loaded)
+{
+    <Loading />
+}
+else
+{
+    <MudStack Row AlignItems="AlignItems.Center" Class="mt-2">
+        <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" OnClick="OpenAddDialogAsync">
+            Add Role
+        </MudButton>
+    </MudStack>
+
+    @if (_roles.Count == 0)
+    {
+        <MudAlert Severity="Severity.Info" Class="mt-3">No roles found. Please add a new role.</MudAlert>
+    }
+    else
+    {
+        <MudDataGrid Items="@_roles" Hover="true" Dense="true" Class="mt-3">
+            <Columns>
+                <PropertyColumn T="IdentityRole" TProperty="string" Property="x => x.Id" Title="ID" />
+                <PropertyColumn T="IdentityRole" TProperty="string" Property="x => x.Name" Title="Role Name" />
+                <TemplateColumn T="IdentityRole" Title="Actions">
+                    <CellTemplate>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       Disabled="@IsProtectedRole(context.Item)"
+                                       OnClick="@(() => ConfirmDeleteAsync(context.Item))" />
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    }
+}
+
+@code {
+    private bool _loaded;
+    private List<IdentityRole> _roles = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _roles = await RoleManager.Roles.AsNoTracking().OrderBy(r => r.Name).ToListAsync();
+        _loaded = true;
+        StateHasChanged();
+    }
+
+    private async Task OpenAddDialogAsync()
+    {
+        var options = new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center };
+        var dialog = DialogService.Show<NewRoleDialog>("New Role", options);
+        var result = await dialog.Result;
+        if (!result.Canceled)
+        {
+            await LoadAsync();
+        }
+    }
+
+    private static bool IsProtectedRole(IdentityRole role)
+        => string.Equals(role.Name, "Admin", StringComparison.OrdinalIgnoreCase);
+
+    private async Task ConfirmDeleteAsync(IdentityRole role)
+    {
+        if (IsProtectedRole(role))
+        {
+            await DialogService.ShowMessageBox(
+                title: "Delete Blocked",
+                message: "You cannot delete the Admin role.",
+                yesText: "OK",
+                options: new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center }
+            );
+            return;
+        }
+
+        bool? result = await DialogService.ShowMessageBox(
+            title: "Delete Role",
+            message: $"Are you sure you want to delete role '{role.Name}'? This action cannot be undone.",
+            yesText: "Delete",
+            noText: "Cancel",
+            options: new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center }
+        );
+
+        if (result == true)
+        {
+            await DeleteRoleAsync(role);
+        }
+    }
+
+    private async Task DeleteRoleAsync(IdentityRole role)
+    {
+        try
+        {
+            var fresh = await RoleManager.FindByIdAsync(role.Id);
+            if (fresh is null)
+            {
+                await DialogService.ShowMessageBox(
+                    title: "Delete Failed",
+                    message: "Role not found.",
+                    yesText: "OK",
+                    options: new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center }
+                );
+                return;
+            }
+
+            if (IsProtectedRole(fresh))
+            {
+                await DialogService.ShowMessageBox(
+                    title: "Delete Blocked",
+                    message: "You cannot delete the Admin role.",
+                    yesText: "OK",
+                    options: new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center }
+                );
+                return;
+            }
+
+            var deleteResult = await RoleManager.DeleteAsync(fresh);
+            if (!deleteResult.Succeeded)
+            {
+                var error = string.Join("\n", deleteResult.Errors.Select(e => e.Description));
+                await DialogService.ShowMessageBox(
+                    title: "Delete Failed",
+                    message: error,
+                    yesText: "OK",
+                    options: new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center }
+                );
+                return;
+            }
+
+            Snackbar.Add($"Role '{fresh.Name}' deleted successfully.", Severity.Success);
+            await LoadAsync();
+        }
+        catch (Exception ex)
+        {
+            await DialogService.ShowMessageBox(
+                title: "Delete Failed",
+                message: ex.Message,
+                yesText: "OK",
+                options: new DialogOptions { CloseButton = true, FullWidth = true, MaxWidth = MaxWidth.Small, Position = DialogPosition.Center }
+            );
+        }
+    }
+}
