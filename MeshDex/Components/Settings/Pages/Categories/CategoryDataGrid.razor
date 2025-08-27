@@ -1,0 +1,30 @@
+﻿@using MeshDex.Domain.Entities
+<MudDataGrid Items="@Items" Hover="true" Dense="true" Class="mt-3">
+    <Columns>
+        <PropertyColumn T="LibraryCategory" TProperty="int" Property="x => x.Id" Title="ID" />
+        <PropertyColumn T="LibraryCategory" TProperty="string" Property="x => x.Name" Title="Name" />
+        <TemplateColumn T="LibraryCategory" Title="Parent">
+            <CellTemplate>
+                @GetParentName(context.Item.ParentId)
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn T="LibraryCategory" Title="Actions">
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="@(() => OnEditRequested.InvokeAsync(context.Item))" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Size="Size.Small" Class="ml-1" OnClick="@(() => OnDeleteRequested.InvokeAsync(context.Item))" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    [Parameter] public List<LibraryCategory> Items { get; set; } = new();
+    [Parameter] public EventCallback<LibraryCategory> OnEditRequested { get; set; }
+    [Parameter] public EventCallback<LibraryCategory> OnDeleteRequested { get; set; }
+
+    private string GetParentName(int? parentId)
+    {
+        if (parentId is not int id) return "—";
+        return Items.FirstOrDefault(c => c.Id == id)?.Name ?? "—";
+    }
+}

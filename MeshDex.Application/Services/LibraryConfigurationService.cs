@@ -1,0 +1,53 @@
+﻿using MeshDex.Domain.Entities;
+using MeshDex.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
+
+namespace MeshDex.Application.Services;
+
+public class LibraryConfigurationService(ApplicationDbContext dbContext)
+{
+    public async Task<LibraryConfiguration?> GetConfigurationAsync()
+    {
+        return await dbContext.LibraryConfigurations.FirstOrDefaultAsync();
+    }
+
+    public async Task<bool> UpdateRootDirectory(string path)
+    {
+        var configuration = await GetConfigurationAsync();
+        if (configuration == null) return false;
+        configuration.RootDirectory = path;
+        try
+        {
+            dbContext.LibraryConfigurations.Update(configuration);
+            await dbContext.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Log.Error(e,"{eMessage}", e.Message);
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task<bool> ToggleInitialised()
+    {
+        var configuration = await GetConfigurationAsync();
+        if (configuration == null) return false;
+
+        configuration.Initialised = !configuration.Initialised;
+        try
+        {
+            dbContext.LibraryConfigurations.Update(configuration);
+            await dbContext.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            Log.Error(e,"{eMessage}", e.Message);
+            return false;
+        }
+
+        return true;
+    }
+}

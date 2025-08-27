@@ -1,0 +1,83 @@
+﻿@inject RoleManager<IdentityRole> RoleManager
+@inject ISnackbar Snackbar
+@using Microsoft.AspNetCore.Identity
+@inherits ComponentBase
+
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" Model="this" Validation="Validate">
+            <MudTextField @bind-Value="_roleName" Label="Role Name" Required="true" For="() => _roleName" />
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <MudAlert Severity="Severity.Error" Class="mt-2">@_error</MudAlert>
+            }
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateAsync">Create</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance? MudDialog { get; set; }
+
+    private MudForm? _form;
+    private string _roleName = string.Empty;
+    private string? _error;
+
+    private IEnumerable<string> Validate()
+    {
+        var errors = new List<string>();
+        if (string.IsNullOrWhiteSpace(_roleName)) errors.Add("Role name is required");
+        return errors;
+    }
+
+    private void Cancel()
+    {
+        MudDialog?.Cancel();
+    }
+
+    private async Task CreateAsync()
+    {
+        _error = null;
+        await _form!.Validate();
+        if (!_form.IsValid)
+            return;
+
+        // Trim and validate name
+        var name = _roleName.Trim();
+        if (string.IsNullOrEmpty(name))
+        {
+            _error = "Role name cannot be empty.";
+            StateHasChanged();
+            return;
+        }
+
+        try
+        {
+            // If already exists, report a friendly error
+            if (await RoleManager.RoleExistsAsync(name))
+            {
+                _error = $"Role '{name}' already exists.";
+                StateHasChanged();
+                return;
+            }
+
+            var result = await RoleManager.CreateAsync(new IdentityRole(name));
+            if (!result.Succeeded)
+            {
+                _error = string.Join("\n", result.Errors.Select(e => e.Description));
+                StateHasChanged();
+                return;
+            }
+
+            Snackbar.Add($"Role '{name}' created successfully.", Severity.Success);
+            MudDialog?.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+}

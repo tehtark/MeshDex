@@ -1,0 +1,99 @@
+﻿@using MeshDex.Application.Services
+@using MeshDex.Domain.Entities
+@inject LibraryCategoryService LibraryCategoryService
+
+<MudDialog>
+    <TitleContent>New Category</TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="_name" Label="Name" Placeholder="e.g. Science" Immediate="true" Required="true"
+                      RequiredError="Name is required" MaxLength="100"/>
+        <MudSelect T="int?" @bind-Value="_parentId" Label="Parent (optional)" Class="mt-2" Clearable="true">
+            <MudSelectItem Value="@((int?)null)">None</MudSelectItem>
+            @foreach (var c in Categories.OrderBy(c => c.Name))
+            {
+                <MudSelectItem Value="@((int?)c.Id)">@c.Name</MudSelectItem>
+            }
+        </MudSelect>
+        @if (!string.IsNullOrWhiteSpace(_error))
+        {
+            <MudText Color="Color.Error" Typo="Typo.caption">@_error</MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="OnCancel">Cancel</MudButton>
+        <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Disabled="@_adding" OnClick="AddAsync">
+            @if (_adding)
+            {
+                <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2"/>
+            }
+            Add
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance? MudDialog { get; set; }
+    [Parameter] public List<LibraryCategory> Categories { get; set; } = new();
+
+    private string _name = string.Empty;
+    private int? _parentId = null;
+    private bool _adding;
+    private string? _error;
+
+    protected override void OnParametersSet()
+    {
+        // Reset fields on open
+        if (!_adding)
+        {
+            _error = null;
+            if (_name == string.Empty && _parentId == null)
+            {
+                _name = string.Empty;
+                _parentId = null;
+            }
+        }
+    }
+
+    private Task OnCancel()
+    {
+        _error = null;
+        MudDialog?.Cancel();
+        return Task.CompletedTask;
+    }
+
+    private async Task AddAsync()
+    {
+        _error = null;
+        var name = _name?.Trim() ?? string.Empty;
+        
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            _error = "Name is required";
+            return;
+        }
+
+        if (Categories.Any(c => string.Equals(c.Name, name, StringComparison.Ordinal)))
+        {
+            _error = "A category with this name already exists.";
+            return;
+        }
+
+        try
+        {
+            _adding = true;
+            await LibraryCategoryService.CreateCategoryAsync(new LibraryCategory { Name = name, ParentId = _parentId });
+            MudDialog?.Close(DialogResult.Ok(true));
+            _name = string.Empty;
+            _parentId = null;
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _adding = false;
+        }
+    }
+
+}

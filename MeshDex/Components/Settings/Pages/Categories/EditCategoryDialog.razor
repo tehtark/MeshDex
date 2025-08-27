@@ -1,0 +1,114 @@
+﻿@using MeshDex.Application.Services
+@using MeshDex.Domain.Entities
+@inject LibraryCategoryService LibraryCategoryService
+
+<MudDialog>
+    <TitleContent>Edit Category</TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="_name" Label="Name" Immediate="true" Required="true" RequiredError="Name is required"
+                      MaxLength="100"/>
+        <MudSelect T="int?" @bind-Value="_parentId" Label="Parent (optional)" Class="mt-2" Clearable="true">
+            <MudSelectItem Value="@((int?)null)">None</MudSelectItem>
+            @foreach (var c in Categories.OrderBy(c => c.Name))
+            {
+                if (c.Id != _id)
+                {
+                    <MudSelectItem Value="@((int?)c.Id)">@c.Name</MudSelectItem>
+                }
+            }
+        </MudSelect>
+        @if (!string.IsNullOrWhiteSpace(_error))
+        {
+            <MudText Color="Color.Error" Typo="Typo.caption">@_error</MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="OnCancel">Cancel</MudButton>
+        <MudButton Class="ml-2" Variant="Variant.Filled" Color="Color.Primary" Disabled="@_saving" OnClick="SaveAsync">
+            @if (_saving)
+            {
+                <MudProgressCircular Indeterminate Size="Size.Small" Class="mr-2"/>
+            }
+            Save
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance? MudDialog { get; set; }
+    [Parameter] public List<LibraryCategory> Categories { get; set; } = new();
+    [Parameter] public LibraryCategory? Category { get; set; }
+
+    private int _id;
+    private string _originalName = string.Empty;
+    private string _name = string.Empty;
+    private int? _parentId = null;
+    private bool _saving;
+    private string? _error;
+
+    protected override void OnParametersSet()
+    {
+        if (Category is not null)
+        {
+            if (_id != Category.Id)
+            {
+                _id = Category.Id;
+                _originalName = Category.Name ?? string.Empty;
+                _name = _originalName;
+                _parentId = Category.ParentId;
+                _error = null;
+            }
+        }
+    }
+
+    private Task OnCancel()
+    {
+        _error = null;
+        MudDialog?.Cancel();
+        return Task.CompletedTask;
+    }
+
+    private async Task SaveAsync()
+    {
+        _error = null;
+        var name = _name?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            _error = "Name is required";
+            return;
+        }
+
+        if (_parentId == _id)
+        {
+            _error = "A category cannot be its own parent.";
+            return;
+        }
+
+        if (!string.Equals(name, _originalName, StringComparison.Ordinal) && Categories.Any(c => c.Id != _id && string.Equals(c.Name, name, StringComparison.Ordinal)))
+        {
+            _error = "A category with this name already exists.";
+            return;
+        }
+
+        try
+        {
+            _saving = true;
+            await LibraryCategoryService.UpdateCategoryAsync(new LibraryCategory
+            {
+                Id = _id,
+                Name = name,
+                ParentId = _parentId
+            });
+            MudDialog?.Close(DialogResult.Ok(true));
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+}

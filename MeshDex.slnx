@@ -1,0 +1,12 @@
+﻿<Solution>
+  <Folder Name="/Libraries/">
+    <Project Path="MeshDex.Application\MeshDex.Application.csproj" Type="Classic C#" />
+    <Project Path="MeshDex.Domain\MeshDex.Domain.csproj" Type="Classic C#" />
+    <Project Path="MeshDex.Infrastructure\MeshDex.Infrastructure.csproj" Type="Classic C#" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="directory.build.props" />
+  </Folder>
+  <Project Path="MeshDex\MeshDex.csproj" Type="Classic C#" />
+</Solution>

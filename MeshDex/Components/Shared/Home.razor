@@ -1,0 +1,38 @@
+﻿@page "/"
+@using MeshDex.Application.Services
+@using Microsoft.AspNetCore.Authorization
+@inject NavigationManager NavigationManager
+@inject LibraryConfigurationService LibraryConfigurationService
+@attribute [Authorize]
+
+<PageTitle>3Dictionary</PageTitle>
+
+@* @if (!_loaded) *@
+@* { *@
+@*     <Loading/> *@
+@* } *@
+@* else *@
+@* { *@
+@*     <ModelBrowser/>  *@
+@* } *@
+
+@code{
+
+    // private bool _loaded;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync();
+
+        switch (libraryConfiguration)
+        {
+            case { Initialised: false }:
+                NavigationManager.NavigateTo("/setup");
+                return;
+            case { Initialised: true }:
+                NavigationManager.NavigateTo("/browser");
+                return;
+        }
+    }
+
+}
