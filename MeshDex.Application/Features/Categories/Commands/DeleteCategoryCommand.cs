@@ -16,7 +16,7 @@ internal sealed class DeleteCategoryCommandHandler(ApplicationDbContext db)
 
     private async Task DeleteRecursiveAsync(int id, CancellationToken ct)
     {
-        var category = await db.LibraryCategories.FindAsync(new object?[] { id }, ct);
+        var category = await db.LibraryCategories.FindAsync([id], ct);
         if (category == null) return;
 
         var children = await db.LibraryCategories.Where(c => c.ParentId == id).ToListAsync(ct);
