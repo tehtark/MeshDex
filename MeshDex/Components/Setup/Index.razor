@@ -7,6 +7,7 @@
 @inject LibraryConfigurationService LibraryConfigurationService
 @inject NavigationManager NavigationManager
 @attribute [Authorize]
+@inherits CancellableComponentBase
 
 <PageTitle>Setup</PageTitle>
 
@@ -63,7 +64,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync();
+        var ct = NewCts();
+        _libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync(ct);
 
         if (_libraryConfiguration is { Initialised: true })
         {
@@ -77,8 +79,9 @@
     private async Task Submit()
     {
         var path = _libraryConfiguration!.RootDirectory?.Trim() ?? string.Empty;
-        await LibraryConfigurationService.UpdateRootDirectory(path);
-        await LibraryConfigurationService.ToggleInitialised();
+        var ct = NewCts();
+        await LibraryConfigurationService.UpdateRootDirectory(path, ct);
+        await LibraryConfigurationService.ToggleInitialised(ct);
         Snackbar.Add("Default directory set successfully.", Severity.Success);
         NavigationManager.NavigateTo("/");
     }

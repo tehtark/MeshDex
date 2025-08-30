@@ -2,6 +2,7 @@
 @using MeshDex.Application.Services
 @using MeshDex.Domain.Entities
 @inject LibraryConfigurationService LibraryConfigurationService
+@inherits CancellableComponentBase
 
 @if (!_loaded || _libraryConfiguration is null)
 {
@@ -27,7 +28,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync();
+        var ct = NewCts();
+        _libraryConfiguration = await LibraryConfigurationService.GetConfigurationAsync(ct);
 
         _loaded = true;
     }

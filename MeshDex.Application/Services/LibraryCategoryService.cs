@@ -7,29 +7,29 @@ namespace MeshDex.Application.Services;
 
 public class LibraryCategoryService(IMediator mediator)
 {
-    public Task<List<LibraryCategory>> GetCategoriesAsync()
-        => mediator.Send(new GetCategoriesQuery());
+    public Task<List<LibraryCategory>> GetCategoriesAsync(CancellationToken cancellationToken = default)
+        => mediator.Send(new GetCategoriesQuery(), cancellationToken);
 
-    public Task<string?> GetCategoryNameAsync(int id)
-        => mediator.Send(new GetCategoryNameQuery(id));
+    public Task<string?> GetCategoryNameAsync(int id, CancellationToken cancellationToken = default)
+        => mediator.Send(new GetCategoryNameQuery(id), cancellationToken);
     
-    public Task<LibraryCategory?> GetCategoryAsync(int id)
-        => mediator.Send(new GetCategoryQuery(id));
+    public Task<LibraryCategory?> GetCategoryAsync(int id, CancellationToken cancellationToken = default)
+        => mediator.Send(new GetCategoryQuery(id), cancellationToken);
 
-    public Task<LibraryCategory> CreateCategoryAsync(LibraryCategory category)
-        => mediator.Send(new CreateCategoryCommand(category));
+    public Task<LibraryCategory> CreateCategoryAsync(LibraryCategory category, CancellationToken cancellationToken = default)
+        => mediator.Send(new CreateCategoryCommand(category), cancellationToken);
 
-    public Task<LibraryCategory> UpdateCategoryAsync(LibraryCategory category)
-        => mediator.Send(new UpdateCategoryCommand(category));
+    public Task<LibraryCategory> UpdateCategoryAsync(LibraryCategory category, CancellationToken cancellationToken = default)
+        => mediator.Send(new UpdateCategoryCommand(category), cancellationToken);
 
-    public async Task DeleteCategoryAsync(int id)
+    public async Task DeleteCategoryAsync(int id, CancellationToken cancellationToken = default)
     {
-        await mediator.Send(new DeleteCategoryCommand(id));
+        await mediator.Send(new DeleteCategoryCommand(id), cancellationToken);
     }
 
-    public Task<bool> CategoryExistsAsync(int id)
-        => mediator.Send(new CategoryExistsQuery(id));
+    public Task<bool> CategoryExistsAsync(int id, CancellationToken cancellationToken = default)
+        => mediator.Send(new CategoryExistsQuery(id), cancellationToken);
 
-    public Task<bool> HasChildrenAsync(int id)
-        => mediator.Send(new CategoryHasChildrenQuery(id));
+    public Task<bool> HasChildrenAsync(int id, CancellationToken cancellationToken = default)
+        => mediator.Send(new CategoryHasChildrenQuery(id), cancellationToken);
 }

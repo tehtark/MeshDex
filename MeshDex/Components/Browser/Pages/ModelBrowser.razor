@@ -3,6 +3,7 @@
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject LibraryModelService LibraryModelService
+@inherits CancellableComponentBase
 <div style="padding-top: 20px;">
     <MudAppBar Dense="true" Gutters="false" Class="height-20" Elevation="0">
         <MudStack Row="true" Spacing="0" AlignItems="AlignItems.Center" Class="height-20">
@@ -55,12 +56,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await Load();
+        await LoadAsync();
     }
 
-    private async Task Load()
+    private async Task LoadAsync()
     {
-        _models = await LibraryModelService.GetAllModelsAsync();
+        var ct = NewCts();
+        _models = await LibraryModelService.GetAllModelsAsync(ct);
         _loaded = true;
     }
 
@@ -77,7 +79,7 @@
         if (result is { Canceled: false })
         {
             Snackbar.Add("Model added successfully", Severity.Success);
-            await Load();
+            await LoadAsync();
             StateHasChanged();
         }
     }

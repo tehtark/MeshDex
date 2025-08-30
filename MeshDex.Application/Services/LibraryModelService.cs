@@ -7,8 +7,8 @@ namespace MeshDex.Application.Services;
 
 public class LibraryModelService(IMediator mediator)
 {
-    public Task<List<LibraryModel>> GetAllModelsAsync()
-        => mediator.Send(new GetAllModelsQuery());
+    public Task<List<LibraryModel>> GetAllModelsAsync(CancellationToken ct = default)
+        => mediator.Send(new GetAllModelsQuery(), ct);
 
     public async Task CreateModelAsync(string? name, int categoryId, CancellationToken ct = default)
     {
